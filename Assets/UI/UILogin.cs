@@ -20,20 +20,20 @@ public class UILogin: MonoBehaviour
         }
 
         public override void onConnectFailed(int var1, string var2){
-            Debug.Log("conect Failed");
+            UIManager.GetUIManager().Tip.ShowTipInfo("Connect Failed");
         }
         public override void onConnectSuccess(){
-            Debug.Log("Connect Success ");
+            UIManager.GetUIManager().Tip.ShowTipInfo("Connect Success");
         }
         public override void onConnecting(){
-            Debug.Log("Connect Connecting");
+            UIManager.GetUIManager().Tip.ShowTipInfo("Connect Connecting");
         }
         public override void onKickedOffline(){
-            Debug.Log("Connect offline");
+            UIManager.GetUIManager().Tip.ShowTipInfo("KickedOff");
         }
 
         public override void onUserTokenExpired(){
-            Debug.Log("Connect expired");
+            UIManager.GetUIManager().Tip.ShowTipInfo("Token Expired");
         }
     }
 
@@ -43,12 +43,13 @@ public class UILogin: MonoBehaviour
         }
         public override void onError(int var1,string var2){
             var info = "Login Error" + var1 + var2;
-            UIManager.GetUIManager().ShowMain(info);
+            UIManager.GetUIManager().Tip.ShowTipInfo(info);
         }
 
         public override void onSuccess(string var1){
             var info = "Login Success  " + var1;
-            UIManager.GetUIManager().ShowMain(info);
+            UIManager.GetUIManager().Tip.ShowTipInfo(info);
+            UIManager.GetUIManager().ShowMain();
         }
     }
 
@@ -66,16 +67,8 @@ public class UILogin: MonoBehaviour
         OpenIMClient.InitSDK(new ConnectCallBack(),info);
 
         LoginButton.onClick.AddListener(()=>{
-            Debug.Log("Login btn click");
-            Debug.Log(UID.text + "   " + TOKEN.text);
             OpenIMClient.Login(new LoginCallBack(),UID.text,TOKEN.text);
         });
     #endif
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

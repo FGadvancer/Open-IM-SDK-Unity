@@ -26,5 +26,8 @@ namespace OpenIM
 
         public abstract void onSuccess(string var1);
     }
+
+
+    
 }   
 

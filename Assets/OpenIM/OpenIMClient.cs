@@ -24,6 +24,11 @@ namespace OpenIM
             if (_Instance == null)
                 Debug.LogError("not find open_im_sdk.Open_im_sdk");
         }
+        #region Tools
+        public static string GetTimeStamp(){
+            return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+        }
+        #endregion
 
         public static void InitSDK(OnConnListenerCallBack callback,InitInfo info)
         {
@@ -32,16 +37,16 @@ namespace OpenIM
 
             var args = JsonUtility.ToJson(info);
             Debug.Log("args = " + args);
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
-            _Instance.CallStatic<bool>("initSDK",callback,time,args);
+            _Instance.CallStatic<bool>("initSDK",callback,GetTimeStamp(),args);
         }
         
         public static void Login(BaseCallBack callback,string uid,string token){
             Debug.Log("Login UID = " + uid);
             Debug.Log("Login TOKEN = " + token);
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
-            _Instance.CallStatic("login",callback,time,uid,token);
+            _Instance.CallStatic("login",callback,GetTimeStamp(),uid,token);
         }
+
+
     }
     
 }

@@ -6,6 +6,7 @@ public class UIManager : MonoBehaviour
 {
     public UILogin Login;
     public UIMain Main;
+    public UITip Tip;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,10 +29,9 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void ShowMain(string tip){
+    public void ShowMain(){
         Login.gameObject.SetActive(false);
         Main.gameObject.SetActive(true);
-        Main.tip.text = tip;
     }
     public void ShowLogin(){
         Login.gameObject.SetActive(true);
