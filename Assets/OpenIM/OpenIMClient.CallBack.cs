@@ -26,6 +26,13 @@ namespace OpenIM
 
         public abstract void onSuccess(string var1);
     }
+    public abstract class SendMsgCallBack : AndroidJavaProxy
+    {
+        public SendMsgCallBack() : base("open_im_sdk_callback.SendMsgCallBack"){}
+        public abstract void onError(int var1,string var2);
+        public abstract void onSuccess(string var1);
+        public abstract void onProgress(int var1);
+    }
 
 
     
