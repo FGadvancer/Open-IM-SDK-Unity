@@ -33,6 +33,12 @@ namespace OpenIM
         public abstract void onSuccess(string var1);
         public abstract void onProgress(int var1);
     }
+    public abstract class OnConversationListener : AndroidJavaClass
+    {
+        public OnConversationListener() : base("open_im_sdk_callback.OnConversationListener"){}
+        
+        public abstract void onConversationChanged(string var1);
+    }
 
 
     

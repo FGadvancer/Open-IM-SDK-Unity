@@ -5,13 +5,14 @@ using UnityEngine;
 namespace OpenIM
 {
     public class InitInfo{
-            public int platform;
-            public string api_addr;
-            public string ws_addr;
-            public string data_dir;
-            public int log_level;
-            public string object_storage;
-            public string encryption_key;
+            public int platformID;
+            public string apiAddr;
+            public string wsAddr;
+            public string dataDir;
+            public int logLevel;
+            public bool isLogStandardOutput;
+            public string logFilePath;
+            public string isExternalExtensions;
     }
 
     public partial class OpenIMClient
@@ -30,20 +31,20 @@ namespace OpenIM
         }
         #endregion
 
-        public static void InitSDK(OnConnListenerCallBack callback,InitInfo info)
+        public static bool InitSDK(OnConnListenerCallBack callback,InitInfo info)
         {
             if (_Instance == null) 
                 Init();
 
             var args = JsonUtility.ToJson(info);
             Debug.Log("args = " + args);
-            _Instance.CallStatic<bool>("initSDK",callback,GetTimeStamp(),args);
+            return Instance.CallStatic<bool>("initSDK",callback,GetTimeStamp(),args);
         }
         
-        public static void Login(BaseCallBack callback,string uid,string token){
-            Debug.Log("Login UID = " + uid);
+        public static void Login(BaseCallBack callback,string userID,string token){
+            Debug.Log("Login userID = " + userID);
             Debug.Log("Login TOKEN = " + token);
-            _Instance.CallStatic("login",callback,GetTimeStamp(),uid,token);
+            _Instance.CallStatic("login",callback,GetTimeStamp(),userID,token);
         }
 
 
