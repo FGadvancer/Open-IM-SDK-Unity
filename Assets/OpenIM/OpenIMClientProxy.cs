@@ -21,7 +21,7 @@ namespace OpenIMClientProxy
 #endif
 
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int init_sdk(CB onConnecting, CB onConnectSuccess, CB onKickedOffline, CB onUserTokenExpired, CB_I_S onConnectFailed, string operationId, string config);
+        public static extern int init_sdk(Action onConnecting, Action onConnectSuccess, Action onKickedOffline, Action onUserTokenExpired, Action<int, string> onConnectFailed, string operationId, string config);
 
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void login(CB_S onSuccess, CB_I_S OnFailed, string uid, string token);
