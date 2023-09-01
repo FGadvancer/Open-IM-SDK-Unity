@@ -31,7 +31,16 @@ public class UILogin : UILogicBase
         {
             loginMgr.Login("6959062403", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI2OTU5MDYyNDAzIiwiUGxhdGZvcm1JRCI6MywiZXhwIjoxNzAwNzIwOTg0LCJuYmYiOjE2OTI5NDQ2ODQsImlhdCI6MTY5Mjk0NDk4NH0.8otKTFrOCs8_ueV10rNOD-rzHrCT_EN0obKS9q79bIc");
         });
-
+        Game.Event.AddListener<int, string>(EventType.LoginFailed, (code, msg) =>
+        {
+            Debug.Log(code);
+            Debug.Log(msg);
+            status.text = msg;
+        });
+        Game.Event.AddListener<string>(EventType.LoginSuc, (msg) =>
+        {
+            Debug.Log(msg);
+        });
     }
     public override void OnUpdate(float dt)
     {

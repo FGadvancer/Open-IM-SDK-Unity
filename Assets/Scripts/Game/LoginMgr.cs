@@ -17,40 +17,36 @@ public class LoginMgr : OnConnListener, BaseListener
     {
         OpenIM.OpenIM.Login(this, id, token);
     }
-
-
     public void OnConnectFailed(int code, string msg)
     {
         Debug.Log("OnConnectFailed");
     }
-
     public void OnConnecting()
     {
         Debug.Log("OnConnecting");
     }
-
     public void OnConnectSuccess()
     {
         Debug.Log("OnConnectSUC");
     }
-
-    public void OnFailed(int code, string msg)
-    {
-        Debug.Log("OnFailed");
-    }
-
     public void OnKickedOffline()
     {
         Debug.Log("OnOffile");
     }
-
-    public void OnSuccess(string msg)
-    {
-        Debug.Log("OnSuc");
-    }
-
     public void OnUserTokenExpired()
     {
         Debug.Log("Expired");
+    }
+    public void OnFailed(int code, string msg)
+    {
+        SDKInstance.QueueOnMainThread((obj) =>
+        {
+            Game.Event.Broadcast<int, string>(EventType.LoginFailed, code, msg);
+        }, this);
+    }
+    public void OnSuccess(string msg)
+    {
+        Debug.Log("OnSuc" + msg);
+        Game.Event.Broadcast<string>(EventType.LoginSuc, msg);
     }
 }

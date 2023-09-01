@@ -14,7 +14,7 @@ public class GameEntry : MonoBehaviour
         Game.UI = UI;
         Game.Timer = Timer;
         Game.Http = Http;
-        Game.Event = new Dawn.Event.EventDispator();
+        Game.Event = new EventDispator();
         Game.Effect = Effect;
     }
 

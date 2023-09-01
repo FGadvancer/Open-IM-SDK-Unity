@@ -4,7 +4,6 @@ using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Dawn.Event;
 
 namespace OpenIM
 {
@@ -24,16 +23,40 @@ namespace OpenIM
 
     public static class OpenIM
     {
-        public static int InitSDK(OnConnListener callback, string operationId, string config)
+        public static int InitSDK(OnConnListener cb, string operationId, string config)
         {
-            return OpenIMSDK.init_sdk(callback.OnConnecting, callback.OnConnectSuccess,
-            callback.OnKickedOffline, callback.OnUserTokenExpired, callback.OnConnectFailed, operationId, config);
+            SDKInstance.QueueOnMainThread((obj) =>
+            {
+                Debug.Log("Init SDKInstance");
+            }, null);
+            return OpenIMSDK.init_sdk(() =>
+            {
+                cb.OnConnecting();
+            }, () =>
+            {
+                cb.OnConnectSuccess();
+            },
+            () =>
+            {
+                cb.OnKickedOffline();
+            }, () =>
+            {
+                cb.OnUserTokenExpired();
+            }, (code, msg) =>
+            {
+                cb.OnConnectFailed(code, msg);
+            }, operationId, config);
         }
 
-        public static void Login(BaseListener callback, string uid, string token)
+        public static void Login(BaseListener cb, string uid, string token)
         {
-            OpenIMSDK.login(callback.OnSuccess, callback.OnFailed, uid, token);
+            OpenIMSDK.login((msg) =>
+            {
+                cb.OnSuccess(msg);
+            }, (code, msg) =>
+            {
+                cb.OnFailed(code, msg);
+            }, uid, token);
         }
     }
-
 }

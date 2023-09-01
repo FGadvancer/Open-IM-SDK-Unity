@@ -22,7 +22,7 @@ public class UITip : UILogicBase
         maskTrans.gameObject.SetActive(false);
         msgTrans.gameObject.SetActive(false);
         tip.text = "";
-        Game.Event.AddListener<string, float, Color, bool, bool>(Dawn.Event.EventType.Tip, OnListenTip);
+        Game.Event.AddListener<string, float, Color, bool, bool>(EventType.Tip, OnListenTip);
     }
     public void OnListenTip(string tip, float duration, Color bgcolor, bool showMask, bool canClose)
     {
@@ -49,7 +49,7 @@ public class UITip : UILogicBase
     }
     public override void OnClose()
     {
-        Game.Event.RemoveListener<string, float, Color, bool, bool>(Dawn.Event.EventType.Tip, OnListenTip);
+        Game.Event.RemoveListener<string, float, Color, bool, bool>(EventType.Tip, OnListenTip);
     }
 
     public override void OnDestroy()

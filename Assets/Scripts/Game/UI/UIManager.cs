@@ -96,7 +96,7 @@ public class UIManager : MonoBehaviour
             {
                 ui.logic.OnOpen();
             }
-            Game.Event.Broadcast<string, float, Color, bool, bool>(Dawn.Event.EventType.Tip, str, duration, Color.red, showMask, canClose);
+            Game.Event.Broadcast<string, float, Color, bool, bool>(EventType.Tip, str, duration, Color.red, showMask, canClose);
         }
     }
     public void ShowTip(string tip, float duration, bool showMask, bool canClose)
@@ -108,7 +108,7 @@ public class UIManager : MonoBehaviour
             {
                 ui.logic.OnOpen();
             }
-            Game.Event.Broadcast<string, float, Color, bool, bool>(Dawn.Event.EventType.Tip, tip, duration, Color.green, showMask, canClose);
+            Game.Event.Broadcast<string, float, Color, bool, bool>(EventType.Tip, tip, duration, Color.green, showMask, canClose);
         }
     }
 }
