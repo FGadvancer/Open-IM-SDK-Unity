@@ -6,14 +6,16 @@ using OpenIM;
 public class UILogin : UILogicBase
 {
     Button loginBtn;
+    Button exitBtn;
     TextMeshProUGUI status;
     LoginMgr loginMgr;
     public override void Init()
     {
 
         loginMgr = new LoginMgr(new IMConfig(3, "http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true));
-        loginBtn = GetComponent<Button>("bg/login");
-        status = GetComponent<TextMeshProUGUI>("bg/status");
+        loginBtn = GetComponent<Button>("login");
+        status = GetComponent<TextMeshProUGUI>("status");
+        exitBtn = GetComponent<Button>("exit");
     }
 
     public override void OnClose()
@@ -33,13 +35,11 @@ public class UILogin : UILogicBase
         });
         Game.Event.AddListener<int, string>(EventType.LoginFailed, (code, msg) =>
         {
-            Debug.Log(code);
-            Debug.Log(msg);
             status.text = msg;
         });
         Game.Event.AddListener<string>(EventType.LoginSuc, (msg) =>
         {
-            Debug.Log(msg);
+            status.text = msg;
         });
     }
     public override void OnUpdate(float dt)

@@ -23,12 +23,14 @@ namespace OpenIM
 
     public static class OpenIM
     {
-        public static int InitSDK(OnConnListener cb, string operationId, string config)
+        static System.Random operationIDGen = new System.Random();
+        static string GetOperationID()
         {
-            SDKInstance.QueueOnMainThread((obj) =>
-            {
-                Debug.Log("Init SDKInstance");
-            }, null);
+            return operationIDGen.Next().ToString();
+        }
+        public static int InitSDK(OnConnListener cb, string config)
+        {
+            SDKHelper.QueueOnMainThread((obj) => { Debug.Log("Init SDKInstance..."); }, null);
             return OpenIMSDK.init_sdk(() =>
             {
                 cb.OnConnecting();
@@ -45,18 +47,29 @@ namespace OpenIM
             }, (errCode, errMsg) =>
             {
                 cb.OnConnectFailed(errCode, errMsg);
-            }, operationId, config);
+            }, GetOperationID(), config);
         }
 
         public static void Login(BaseListener cb, string uid, string token)
         {
             OpenIMSDK.login((data) =>
             {
-                cb.OnSuccess(data);
+                SDKHelper.QueueOnMainThread((obj) => { cb.OnSuccess(data); }, null);
             }, (errCode, errMsg) =>
             {
-                cb.OnError(errCode, errMsg);
+                SDKHelper.QueueOnMainThread((obj) => { cb.OnError(errCode, errMsg); }, null);
             }, uid, token);
+        }
+
+        public static void LogOut(BaseListener cb)
+        {
+            OpenIMSDK.logout((data) =>
+            {
+                SDKHelper.QueueOnMainThread((obj) => { cb.OnSuccess(data); }, null);
+            }, (errCode, errMsg) =>
+            {
+                SDKHelper.QueueOnMainThread((obj) => { cb.OnError(errCode, errMsg); }, null);
+            }, GetOperationID());
         }
     }
 }

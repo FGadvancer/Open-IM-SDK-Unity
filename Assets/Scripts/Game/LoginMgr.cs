@@ -8,14 +8,16 @@ public class LoginMgr : OnConnListener, BaseListener
     {
         this.config = config;
         Debug.Log(JsonUtility.ToJson(config));
-        int res = OpenIM.OpenIM.InitSDK(this, "12345", JsonUtility.ToJson(config));
+        int res = OpenIM.OpenIM.InitSDK(this, JsonUtility.ToJson(config));
         Debug.Log("InitSDK " + res);
     }
-
-
     public void Login(string id, string token)
     {
         OpenIM.OpenIM.Login(this, id, token);
+    }
+    public void LogOut()
+    {
+        OpenIM.OpenIM.LogOut(this);
     }
     public void OnConnectFailed(int code, string msg)
     {
@@ -37,16 +39,14 @@ public class LoginMgr : OnConnListener, BaseListener
     {
         Debug.Log("Expired");
     }
-    public void OnFailed(int code, string msg)
+    public void OnError(int code, string msg)
     {
-        SDKInstance.QueueOnMainThread((obj) =>
-        {
-            Game.Event.Broadcast<int, string>(EventType.LoginFailed, code, msg);
-        }, this);
+        Debug.Log(msg);
+        Game.Event.Broadcast<int, string>(EventType.LoginFailed, code, msg);
     }
     public void OnSuccess(string msg)
     {
-        Debug.Log("OnSuc" + msg);
+        Debug.Log(msg);
         Game.Event.Broadcast<string>(EventType.LoginSuc, msg);
     }
 }
