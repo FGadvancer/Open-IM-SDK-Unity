@@ -9,8 +9,8 @@ namespace OpenIM
 {
     public interface BaseListener
     {
-        void OnSuccess(string msg);
-        void OnFailed(int code, string msg);
+        void OnSuccess(string data);
+        void OnError(int errCode, string errMsg);
     }
     public interface OnConnListener
     {
@@ -18,7 +18,7 @@ namespace OpenIM
         void OnConnectSuccess();
         void OnKickedOffline();
         void OnUserTokenExpired();
-        void OnConnectFailed(int code, string msg);
+        void OnConnectFailed(int errCode, string errMsg);
     }
 
     public static class OpenIM
@@ -42,20 +42,20 @@ namespace OpenIM
             }, () =>
             {
                 cb.OnUserTokenExpired();
-            }, (code, msg) =>
+            }, (errCode, errMsg) =>
             {
-                cb.OnConnectFailed(code, msg);
+                cb.OnConnectFailed(errCode, errMsg);
             }, operationId, config);
         }
 
         public static void Login(BaseListener cb, string uid, string token)
         {
-            OpenIMSDK.login((msg) =>
+            OpenIMSDK.login((data) =>
             {
-                cb.OnSuccess(msg);
-            }, (code, msg) =>
+                cb.OnSuccess(data);
+            }, (errCode, errMsg) =>
             {
-                cb.OnFailed(code, msg);
+                cb.OnError(errCode, errMsg);
             }, uid, token);
         }
     }
