@@ -7,69 +7,27 @@ using System.Text;
 
 namespace OpenIM
 {
-    public interface BaseListener
-    {
-        void OnSuccess(string data);
-        void OnError(int errCode, string errMsg);
-    }
-    public interface OnConnListener
-    {
-        void OnConnecting();
-        void OnConnectSuccess();
-        void OnKickedOffline();
-        void OnUserTokenExpired();
-        void OnConnectFailed(int errCode, string errMsg);
-    }
-
-    public static class OpenIM
+    public static class OpenIMSDK
     {
         static System.Random operationIDGen = new System.Random();
         static string GetOperationID()
         {
             return operationIDGen.Next().ToString();
         }
-        public static int InitSDK(OnConnListener cb, string config)
+        public static int InitSDK(IMConfig config, CB_I_S cb)
         {
-            SDKHelper.QueueOnMainThread((obj) => { Debug.Log("Init SDKInstance..."); }, null);
-            return OpenIMSDK.init_sdk(() =>
-            {
-                cb.OnConnecting();
-            }, () =>
-            {
-                cb.OnConnectSuccess();
-            },
-            () =>
-            {
-                cb.OnKickedOffline();
-            }, () =>
-            {
-                cb.OnUserTokenExpired();
-            }, (errCode, errMsg) =>
-            {
-                cb.OnConnectFailed(errCode, errMsg);
-            }, GetOperationID(), config);
+            SDKHelper.QueueOnMainThread(() => { Debug.Log("Init SDKHelper"); });
+            return OpenIMDLL.init_sdk(cb, GetOperationID(), JsonUtility.ToJson(config));
         }
 
-        public static void Login(BaseListener cb, string uid, string token)
+        public static void Login(string uid, string token, CB_I_S_S cb)
         {
-            OpenIMSDK.login((data) =>
-            {
-                SDKHelper.QueueOnMainThread((obj) => { cb.OnSuccess(data); }, null);
-            }, (errCode, errMsg) =>
-            {
-                SDKHelper.QueueOnMainThread((obj) => { cb.OnError(errCode, errMsg); }, null);
-            }, uid, token);
+            OpenIMDLL.login(cb, GetOperationID(), uid, token);
         }
 
-        public static void LogOut(BaseListener cb)
+        public static void LogOut(CB_I_S_S cb)
         {
-            OpenIMSDK.logout((data) =>
-            {
-                SDKHelper.QueueOnMainThread((obj) => { cb.OnSuccess(data); }, null);
-            }, (errCode, errMsg) =>
-            {
-                SDKHelper.QueueOnMainThread((obj) => { cb.OnError(errCode, errMsg); }, null);
-            }, GetOperationID());
+            OpenIMDLL.logout(cb, GetOperationID());
         }
     }
 }
