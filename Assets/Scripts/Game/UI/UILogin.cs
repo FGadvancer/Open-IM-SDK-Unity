@@ -14,10 +14,7 @@ public class UILogin : UILogicBase
         exitBtn = GetComponent<Button>("exit");
     }
 
-    public override void OnClose()
-    {
 
-    }
 
     public override void OnDestroy()
     {
@@ -48,7 +45,14 @@ public class UILogin : UILogicBase
             status.text = msg;
         });
     }
+    public override void OnUpdate(float dt)
+    {
 
+    }
+    public override void OnClose()
+    {
+
+    }
     public void OnConnectStatusChange(int eventId, string data)
     {
         Debug.Log(eventId + "  " + data);
@@ -58,8 +62,4 @@ public class UILogin : UILogicBase
         Debug.Log(errCode + "  " + errMsg + "  " + data);
     }
 
-    public override void OnUpdate(float dt)
-    {
-
-    }
 }
