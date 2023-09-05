@@ -12,10 +12,8 @@ public class UITip : UILogicBase
     public override void Init()
     {
         maskTrans = GetComponent<Transform>("mask");
-        msgBg = GetComponent<Image>("msg");
-        maskBtn = GetComponent<Button>("mask");
-        msgTrans = GetComponent<Transform>("msg");
-        tip = GetComponent<TextMeshProUGUI>("msg/txt");
+        msgBg = GetComponent<Image>("bg");
+        tip = GetComponent<TextMeshProUGUI>("bg/text");
     }
     public override void OnOpen()
     {

@@ -10,16 +10,11 @@ public class UILogin : UILogicBase
     public override void Init()
     {
         loginBtn = GetComponent<Button>("login");
-        status = GetComponent<TextMeshProUGUI>("status");
         exitBtn = GetComponent<Button>("exit");
     }
-
-
-
     public override void OnDestroy()
     {
     }
-
     public override void OnOpen()
     {
         var config = new IMConfig(3, "http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true);
