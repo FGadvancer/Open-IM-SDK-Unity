@@ -6,9 +6,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 namespace OpenIM
 {
-    public delegate void CB_I_S(int eventName, string data);
-    public delegate void CB_I_S_S(int errCode, string errMsg, string data);
-    public delegate void CB_I_S_S_I(int errCode, string errMsg, string data, int progress);
+    public delegate void ConnectStatus(int eventId, string data);
+    public delegate void LoginStatus(int errCode, string errMsg, string data);
+    public delegate void LogOutStatus(int errCode, string errMsg, string data);
+    public delegate void NetworkStatus(int errorCode, string errMsg, string data);
+    public delegate void SendMessage(int errorCode, string errMsg, string data, int progress);
     public class OpenIMDLL
     {
 #if (UNITY_IPHONE || UNITY_TVOS || UNITY_WEBGL || UNITY_SWITCH) && !UNITY_EDITOR
@@ -18,15 +20,15 @@ namespace OpenIM
 #endif
 
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int init_sdk(CB_I_S cCallback, string operationID, string config);
+        public static extern int init_sdk(ConnectStatus cb, string operationID, string config);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void un_init_sdk(string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void login(CB_I_S_S cCallback, string operationID, string uid, string token);
+        public static extern void login(LoginStatus cb, string operationID, string uid, string token);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void logout(CB_I_S_S cCallback, string operationID);
+        public static extern void logout(LogOutStatus cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void network_status_changed(CB_I_S_S cCallback, string operationID);
+        public static extern void network_status_changed(NetworkStatus cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int get_login_status(string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
@@ -78,6 +80,6 @@ namespace OpenIM
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern string create_forward_message(string operationID, string m);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void send_message(CB_I_S_S_I cCallback, string operationID, string message, string recvID, string groupID, string offlinePushInfo);
+        public static extern void send_message(SendMessage cb, string operationID, string message, string recvID, string groupID, string offlinePushInfo);
     }
 }

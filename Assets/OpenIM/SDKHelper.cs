@@ -44,7 +44,6 @@ namespace OpenIM
         //全部执行列表（无延迟）
         List<NoDelayedQueueItem> listNoDelayActions = new List<NoDelayedQueueItem>();
 
-
         //单个执行单元（有延迟）
         struct DelayedQueueItem
         {

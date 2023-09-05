@@ -2,6 +2,11 @@ using System;
 
 namespace OpenIM
 {
+    public delegate void OnConnectStatus(EventId eventId, string data);
+    public delegate void OnLoginStatus(ErrorCode errCode, string errMsg, string data);
+    public delegate void OnLogOutStatus(ErrorCode errCode, string errMsg, string data);
+    public delegate void OnNetworkStatus(ErrorCode errorCode, string errMsg, string data);
+    public delegate void OnSendMessage(ErrorCode errorCode, string errMsg, string data, int progress);
     public enum EventId
     {
         CONNECTING,
@@ -9,6 +14,10 @@ namespace OpenIM
         CONNECT_FAILED,
         KICKED_OFFLINE,
         USER_TOKEN_EXPIRED,
+    }
+    public enum ErrorCode
+    {
+
     }
     [Serializable]
     public class IMConfig
@@ -34,6 +43,4 @@ namespace OpenIM
             isExternalExtensions = iee;
         }
     }
-
-
 }
