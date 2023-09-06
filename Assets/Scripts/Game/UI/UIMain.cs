@@ -27,6 +27,7 @@ public partial class UIMain : UILogicBase
     public override void Init()
     {
         InitChat();
+        InitMy();
         chatTrans = GetComponent<RectTransform>("chat");
         addressBookTrans = GetComponent<RectTransform>("addressbook");
         workTrans = GetComponent<RectTransform>("work");
@@ -39,6 +40,7 @@ public partial class UIMain : UILogicBase
     public override void OnOpen()
     {
         OpenChat();
+        OpenMy();
 
         OnToggle(chatToggle, (isOn) =>
         {
@@ -58,6 +60,9 @@ public partial class UIMain : UILogicBase
         });
 
         chatToggle.isOn = true;
+        addressBookToggle.isOn = false;
+        workToggle.isOn = false;
+        myToggle.isOn = false;
         ShowTab(MenuTab.Chat);
     }
 
@@ -81,6 +86,7 @@ public partial class UIMain : UILogicBase
     public override void OnClose()
     {
         CloseChat();
+        CloseMy();
     }
 
     public override void OnDestroy()

@@ -17,6 +17,12 @@ namespace OpenIM
         None = 0,
         LoginRepeatError = 10102
     }
+    public enum LoginStatus
+    {
+        Logout = 1,
+        Logging = 2,
+        Logged = 3,
+    }
     public delegate void OnConnectStatus(EventId eventId, string data);
     public delegate void OnLoginStatus(ErrorCode errCode, string errMsg, string data);
     public delegate void OnLogOutStatus(ErrorCode errCode, string errMsg, string data);
@@ -103,6 +109,11 @@ namespace OpenIM
             SDKHelper.Initialize();
             Debug.Log("InitSDK  " + JsonUtil.ToJson(config));
             return OpenIMDLL.init_sdk(OnConnectStatusChange, GetOperationID(), JsonUtility.ToJson(config));
+        }
+
+        public static LoginStatus GetLoginStatus()
+        {
+            return (LoginStatus)OpenIMDLL.get_login_status(GetOperationID());
         }
 
         public static void Login(string uid, string token, OnLoginStatus cb)

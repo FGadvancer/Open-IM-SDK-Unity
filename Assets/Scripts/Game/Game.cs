@@ -11,10 +11,15 @@ public static class Game
     public static EffectMgr Effect = null;
     public static EventDispator Event = null;
     public static HttpManager Http = null;
+    public static LocalData LocalData = null;
     static Dictionary<Type, ProcedureBase> procedures = new Dictionary<Type, ProcedureBase>();
     public static void Init()
     {
         var config = new IMConfig("http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true);
+        var localDataJson = PlayerPrefs.GetString(Game.Config.LocalDataSaveName);
+        Debug.Log("Load Local Data" + localDataJson);
+        Game.LocalData = new LocalData();
+        JsonUtility.FromJsonOverwrite(localDataJson, Game.LocalData);
         int res = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
         Debug.Log("InitSDK res" + res);
     }

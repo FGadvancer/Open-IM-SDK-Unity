@@ -7,7 +7,7 @@ using System.Text;
 namespace OpenIM
 {
     public delegate void ConnectStatus(int eventId, string data);
-    public delegate void LoginStatus(int errCode, string errMsg, string data);
+    public delegate void LoginStatusChange(int errCode, string errMsg, string data);
     public delegate void LogOutStatus(int errCode, string errMsg, string data);
     public delegate void NetworkStatus(int errorCode, string errMsg, string data);
     public delegate void SendMessage(int errorCode, string errMsg, string data, int progress);
@@ -26,7 +26,7 @@ namespace OpenIM
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void un_init_sdk(string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void login(LoginStatus cb, string operationID, string uid, string token);
+        public static extern void login(LoginStatusChange cb, string operationID, string uid, string token);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void logout(LogOutStatus cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]

@@ -15,6 +15,7 @@ public class GameEntry : MonoBehaviour
         Game.Timer = Timer;
         Game.Http = Http;
         Game.Event = new EventDispator();
+        Game.Config = Resources.Load("GameConfig", typeof(GameConfig)) as GameConfig;
         Game.Effect = Effect;
     }
 
@@ -35,6 +36,16 @@ public class GameEntry : MonoBehaviour
         if (curProcedure != null)
         {
             curProcedure.Update(Time.deltaTime);
+        }
+    }
+
+    void OnDestroy()
+    {
+        Debug.Log(" GameEntry Destroy()");
+        if (Game.LocalData != null)
+        {
+            Debug.Log(" GameEntry SaveLocalData" + JsonUtility.ToJson(Game.LocalData));
+            PlayerPrefs.SetString(Game.Config.LocalDataSaveName, JsonUtility.ToJson(Game.LocalData));
         }
     }
 
