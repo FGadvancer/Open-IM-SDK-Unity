@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using SuperScrollView;
 public abstract class UILogicBase
 {
     public Transform UIRoot;
@@ -32,6 +34,15 @@ public abstract class UILogicBase
     {
         return GetTrans(path).GetComponent<T>();
     }
+    public T GetComponent<T>(Transform parent, string path = "")
+    {
+        Debug.Assert(parent != null);
+        if (path != "")
+        {
+            parent = parent.Find(path);
+        }
+        return parent.GetComponent<T>();
+    }
 
     public void OnClick(Button btn, UnityAction cb)
     {
@@ -48,5 +59,17 @@ public abstract class UILogicBase
         {
             cb(isOn);
         });
+    }
+
+    public void RefreshList(LoopListView2 list, int count)
+    {
+        if (list.ItemTotalCount != count)
+        {
+            list.SetListItemCount(count);
+        }
+        else
+        {
+            list.RefreshAllShownItem();
+        }
     }
 }

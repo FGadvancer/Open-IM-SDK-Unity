@@ -1,13 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace OpenIM
 {
-
+    public delegate void OnConnectStatus(EventId eventId, string data);
+    public delegate void OnLoginStatus(ErrorCode errCode, string errMsg, string data);
+    public delegate void OnLogOutStatus(ErrorCode errCode, string errMsg, string data);
+    public delegate void OnNetworkStatus(ErrorCode errorCode, string errMsg, string data);
+    public delegate void OnSendMessage(ErrorCode errorCode, string errMsg, string data, int progress);
+    public delegate void OnRecvConversationList(ErrorCode errorCode, string errMsg, List<Conversation> list);
     public static class OpenIMSDK
     {
         public enum FuncBindKey
@@ -15,6 +17,7 @@ namespace OpenIM
             Conn,
             Login,
             Logout,
+            RecvConversationMsg,
         }
         static Dictionary<FuncBindKey, Delegate> callBackBindDic = new Dictionary<FuncBindKey, Delegate>();
         static System.Random operationIDGen = new System.Random();
@@ -59,6 +62,21 @@ namespace OpenIM
                 }
             });
         }
+        public static void OnRecvConversationList(int errCode, string errMsg, string data)
+        {
+            SDKHelper.QueueOnMainThread(() =>
+            {
+                Delegate cb = null;
+                var suc = callBackBindDic.TryGetValue(FuncBindKey.RecvConversationMsg, out cb);
+                if (suc)
+                {
+                    // Debug.Log(data);
+                    var list = JsonUtil.FromJson<List<Conversation>>(data);
+                    // Debug.Log(list);
+                    cb.DynamicInvoke((ErrorCode)errCode, errMsg, list);
+                }
+            });
+        }
         static void Register(FuncBindKey key, Delegate cb)
         {
             if (callBackBindDic.ContainsKey(key))
@@ -84,6 +102,12 @@ namespace OpenIM
         {
             Register(FuncBindKey.Logout, cb);
             OpenIMDLL.logout(OnLoginOut, GetOperationID());
+        }
+
+        public static void GetConversationList(OnRecvConversationList cb)
+        {
+            Register(FuncBindKey.RecvConversationMsg, cb);
+            OpenIMDLL.get_all_conversation_list(OnRecvConversationList, GetOperationID());
         }
     }
 }

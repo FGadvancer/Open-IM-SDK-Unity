@@ -11,7 +11,9 @@ namespace OpenIM
     public delegate void LogOutStatus(int errCode, string errMsg, string data);
     public delegate void NetworkStatus(int errorCode, string errMsg, string data);
     public delegate void SendMessage(int errorCode, string errMsg, string data, int progress);
-    public class OpenIMDLL
+    public delegate void RecvConversationMsg(int errorCode, string errMsg, string data);
+    public delegate void RecvHistoryMsg(int errorCode, string errMsg, string data);
+    class OpenIMDLL
     {
 #if (UNITY_IPHONE || UNITY_TVOS || UNITY_WEBGL || UNITY_SWITCH) && !UNITY_EDITOR
         const string OPENIMDLL = "__Internal";
@@ -79,6 +81,10 @@ namespace OpenIM
         public static extern string create_face_message(string operationID, int index, string data);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern string create_forward_message(string operationID, string m);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void get_all_conversation_list(RecvConversationMsg cb, string operationID);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void get_advanced_history_message_list(RecvHistoryMsg cb, string operationID, string getMessageOptions);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void send_message(SendMessage cb, string operationID, string message, string recvID, string groupID, string offlinePushInfo);
     }

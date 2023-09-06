@@ -21,17 +21,18 @@ public class UILogin : UILogicBase
     }
     public override void OnOpen()
     {
-        var config = new IMConfig(2, "http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true);
-        int res = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
-        Debug.Log("Init SDK  " + res);
         OnClick(loginBtn, () =>
         {
             OpenIMSDK.Login(uid.text, token.text, OnLoginStatusChange);
         });
-        OnClick(exitBtn, () =>
+    }
+    public void OnLoginStatusChange(ErrorCode errCode, string errMsg, string data)
+    {
+        Debug.Log(errCode + "  " + errMsg + "  " + data);
+        if (errCode == ErrorCode.LoginRepeatError)
         {
-            OpenIMSDK.Logout(OnLogoutStatus);
-        });
+            Game.ChangeProcecure<ProcedureMain>();
+        }
     }
     public override void OnUpdate(float dt)
     {
@@ -39,18 +40,7 @@ public class UILogin : UILogicBase
     }
     public override void OnClose()
     {
+    }
 
-    }
-    public void OnConnectStatusChange(EventId id, string data)
-    {
-        Debug.Log(id + "  " + data);
-    }
-    public void OnLoginStatusChange(ErrorCode errCode, string errMsg, string data)
-    {
-        Debug.Log(errCode + "  " + errMsg + "  " + data);
-    }
-    public void OnLogoutStatus(ErrorCode errCode, string errMsg, string data)
-    {
-        Debug.Log(errCode + "  " + errMsg + "  " + data);
-    }
+
 }

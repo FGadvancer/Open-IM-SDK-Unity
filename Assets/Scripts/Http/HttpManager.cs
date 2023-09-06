@@ -1,9 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 public class HttpManager : MonoBehaviour
 {
     Dictionary<UnityWebRequest, Action<string>> requestCallbacks = new Dictionary<UnityWebRequest, Action<string>>();
@@ -48,6 +48,33 @@ public class HttpManager : MonoBehaviour
         {
             requestCallbacks.Remove(request);
             request.Dispose();
+        }
+    }
+    Texture2D texture2D;
+    public void SetImage(Image image, string url)
+    {
+        if (url == "")
+        {
+            return;
+        }
+        StartCoroutine(LoadTexture(image, url));
+    }
+    IEnumerator LoadTexture(Image image, string url)
+    {
+        using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(url))
+        {
+            yield return uwr.SendWebRequest();
+
+            if (uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError)
+            {
+                Debug.LogError("图片加载失败" + url + uwr.error);
+            }
+            else
+            {
+                texture2D = DownloadHandlerTexture.GetContent(uwr);
+                Sprite temp = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.width), Vector2.zero);
+                image.sprite = temp;
+            }
         }
     }
 }

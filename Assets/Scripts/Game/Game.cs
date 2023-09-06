@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using OpenIM;
 public static class Game
 {
     public static GameEntry Entry = null;
@@ -13,9 +14,31 @@ public static class Game
     static Dictionary<Type, ProcedureBase> procedures = new Dictionary<Type, ProcedureBase>();
     public static void Init()
     {
+        var config = new IMConfig(2, "http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true);
+        int res = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
+        Debug.Log("Init SDK  " + res);
     }
 
-
+    public static void OnConnectStatusChange(EventId id, string data)
+    {
+        Debug.Log(id + "  " + data);
+        if (id == EventId.CONNECTING)
+        {
+        }
+        else if (id == EventId.CONNECT_SUCCESS)
+        {
+            Game.ChangeProcecure<ProcedureMain>();
+        }
+        else if (id == EventId.CONNECT_FAILED)
+        {
+        }
+        else if (id == EventId.KICKED_OFFLINE)
+        {
+        }
+        else if (id == EventId.USER_TOKEN_EXPIRED)
+        {
+        }
+    }
     public static void ChangeProcecure<T>() where T : ProcedureBase
     {
         ProcedureBase procedure;
