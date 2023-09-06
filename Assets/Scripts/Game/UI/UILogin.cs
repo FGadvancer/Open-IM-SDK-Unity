@@ -25,13 +25,29 @@ public class UILogin : UILogicBase
         {
             OpenIMSDK.Login(uid.text, token.text, OnLoginStatusChange);
         });
+        OnClick(exitBtn, () =>
+        {
+            OpenIMSDK.Logout(OnLogout);
+        });
     }
     public void OnLoginStatusChange(ErrorCode errCode, string errMsg, string data)
     {
-        Debug.Log(errCode + "  " + errMsg + "  " + data);
+        Debug.LogError(errCode + "  " + errMsg + "  " + data);
         if (errCode == ErrorCode.LoginRepeatError)
         {
             Game.ChangeProcecure<ProcedureMain>();
+        }
+    }
+    public void OnLogout(ErrorCode errCode, string errMsg, string data)
+    {
+        Debug.LogError(errCode + "  " + errMsg + "  " + data);
+        if (errCode != ErrorCode.None)
+        {
+            // Game.UI.ShowError(data, 2, true, true);
+        }
+        else
+        {
+            // Game.UI.ShowTip("Logout Suc", 2, false, false);
         }
     }
     public override void OnUpdate(float dt)

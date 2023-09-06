@@ -14,9 +14,9 @@ public static class Game
     static Dictionary<Type, ProcedureBase> procedures = new Dictionary<Type, ProcedureBase>();
     public static void Init()
     {
-        var config = new IMConfig(2, "http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true);
+        var config = new IMConfig("http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true);
         int res = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
-        Debug.Log("Init SDK  " + res);
+        Debug.Log("InitSDK res" + res);
     }
 
     public static void OnConnectStatusChange(EventId id, string data)
@@ -37,6 +37,7 @@ public static class Game
         }
         else if (id == EventId.USER_TOKEN_EXPIRED)
         {
+            Game.UI.ShowTip("User Token Expired", 2);
         }
     }
     public static void ChangeProcecure<T>() where T : ProcedureBase

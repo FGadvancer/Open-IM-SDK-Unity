@@ -39,7 +39,6 @@ public partial class UIMain
     {
         if (err == ErrorCode.None)
         {
-            Debug.Log(list.Count);
             if (list != null)
             {
                 conversationData = list;

@@ -4,6 +4,19 @@ using System;
 
 namespace OpenIM
 {
+    public enum EventId
+    {
+        CONNECTING,
+        CONNECT_SUCCESS,
+        CONNECT_FAILED,
+        KICKED_OFFLINE,
+        USER_TOKEN_EXPIRED,
+    }
+    public enum ErrorCode
+    {
+        None = 0,
+        LoginRepeatError = 10102
+    }
     public delegate void OnConnectStatus(EventId eventId, string data);
     public delegate void OnLoginStatus(ErrorCode errCode, string errMsg, string data);
     public delegate void OnLogOutStatus(ErrorCode errCode, string errMsg, string data);
@@ -70,9 +83,8 @@ namespace OpenIM
                 var suc = callBackBindDic.TryGetValue(FuncBindKey.RecvConversationMsg, out cb);
                 if (suc)
                 {
-                    // Debug.Log(data);
+                    Debug.Log(data);
                     var list = JsonUtil.FromJson<List<Conversation>>(data);
-                    // Debug.Log(list);
                     cb.DynamicInvoke((ErrorCode)errCode, errMsg, list);
                 }
             });
@@ -89,6 +101,7 @@ namespace OpenIM
         {
             Register(FuncBindKey.Conn, cb);
             SDKHelper.Initialize();
+            Debug.Log("InitSDK  " + JsonUtil.ToJson(config));
             return OpenIMDLL.init_sdk(OnConnectStatusChange, GetOperationID(), JsonUtility.ToJson(config));
         }
 

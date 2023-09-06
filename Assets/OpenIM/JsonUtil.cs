@@ -1,4 +1,6 @@
 using UnityEngine;
+using Newtonsoft.Json;
+
 
 namespace OpenIM
 {
@@ -10,26 +12,28 @@ namespace OpenIM
         }
         public static string ToJson<T>(T obj)
         {
-            if (obj == null) return "null";
-            if (typeof(T).GetInterface("IList") != null)
-            {
-                Pack<T> pack = new Pack<T>();
-                pack.data = obj;
-                string json = JsonUtility.ToJson(pack);
-                return json.Substring(8, json.Length - 9);
-            }
-            return JsonUtility.ToJson(obj);
+            return JsonConvert.SerializeObject(obj);
+            // if (obj == null) return "null";
+            // if (typeof(T).GetInterface("IList") != null)
+            // {
+            //     Pack<T> pack = new Pack<T>();
+            //     pack.data = obj;
+            //     string json = JsonUtility.ToJson(pack);
+            //     return json.Substring(8, json.Length - 9);
+            // }
+            // return JsonUtility.ToJson(obj);
         }
         public static T FromJson<T>(string json)
         {
-            if (json == "null" && typeof(T).IsClass) return default(T);
-            if (typeof(T).GetInterface("IList") != null)
-            {
-                json = "{\"data\":{data}}".Replace("{data}", json);
-                Pack<T> pack = JsonUtil.FromJson<Pack<T>>(json);
-                return pack.data;
-            }
-            return JsonUtility.FromJson<T>(json);
+            return JsonConvert.DeserializeObject<T>(json);
+            // if (json == "null" && typeof(T).IsClass) return default(T);
+            // if (typeof(T).GetInterface("IList") != null)
+            // {
+            //     json = "{\"data\":{data}}".Replace("{data}", json);
+            //     Pack<T> pack = JsonUtil.FromJson<Pack<T>>(json);
+            //     return pack.data;
+            // }
+            // return JsonUtility.FromJson<T>(json);
         }
     }
 }

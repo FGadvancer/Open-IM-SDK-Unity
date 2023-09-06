@@ -99,6 +99,10 @@ public class UIManager : MonoBehaviour
             Game.Event.Broadcast<string, float, Color, bool, bool>(EventType.Tip, str, duration, Color.red, showMask, canClose);
         }
     }
+    public void ShowTip(string tip, float duration)
+    {
+        ShowTip(tip, duration, false, false);
+    }
     public void ShowTip(string tip, float duration, bool showMask, bool canClose)
     {
         UIItem ui;

@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using OpenIM;
 using System;
+using Dawn;
 public class ConversationItem
 {
     UILogicBase ui;
@@ -24,11 +25,19 @@ public class ConversationItem
 
     public void SetItemInfo(Conversation conversation)
     {
-        Debug.Log(JsonUtility.ToJson(conversation));
+        // Debug.Log(JsonUtil.ToJson(conversation));
         Game.Http.SetImage(icon, conversation.faceURL);
         name.text = conversation.showName;
-        // lastMessage.text = conversation.latestMsg;
-        var dateTime = new DateTime(conversation.latestMsgSendTime);
-        time.text = string.Format("{0}:{1}", dateTime.Hour, dateTime.Minute);
+        var msg = conversation.GetLatestMsg();
+        // Debug.Log(JsonUtil.ToJson(msg));
+        if (msg != null)
+        {
+            lastMessage.text = msg.textElem.content;
+        }
+        else
+        {
+            lastMessage.text = "";
+        }
+        time.text = StringUtils.TimeStampToStr1(conversation.latestMsgSendTime);
     }
 }
