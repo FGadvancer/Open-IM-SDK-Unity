@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace OpenIM
 {
+    public enum LoginStatus
+    {
+        Logout = 1,
+        Logging = 2,
+        Logged = 3,
+    }
     public enum PlatFormID
     {
         None = 0,

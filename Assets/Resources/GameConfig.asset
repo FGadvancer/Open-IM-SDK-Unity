@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6618438674a5e324eaa210e1987aa905, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
+  LocalDataSaveName: LocalData
   FrameRate: 60
   MusicVolume: 0.7
   SFXVolume: 0.9
+  TestID: 4365007572
+  TestToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiI0MzY1MDA3NTcyIiwiUGxhdGZvcm1JRCI6MywiZXhwIjoxNzAxNzYzODQ1LCJuYmYiOjE2OTM5ODc1NDUsImlhdCI6MTY5Mzk4Nzg0NX0.wK4f-R_iuyX7i6gelO2_smob50bdR_2s6FnMvb3xA6U

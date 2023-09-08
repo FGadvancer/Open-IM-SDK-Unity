@@ -1,91 +1,128 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Runtime.InteropServices;
-using System.Text;
+
 namespace OpenIM
 {
-    public delegate void ConnectStatus(int eventId, string data);
-    public delegate void LoginStatusChange(int errCode, string errMsg, string data);
-    public delegate void LogOutStatus(int errCode, string errMsg, string data);
-    public delegate void NetworkStatus(int errorCode, string errMsg, string data);
-    public delegate void SendMessage(int errorCode, string errMsg, string data, int progress);
-    public delegate void RecvConversationMsg(int errorCode, string errMsg, string data);
-    public delegate void RecvHistoryMsg(int errorCode, string errMsg, string data);
-    class OpenIMDLL
+    public delegate void OnConnectStatus(EventId eventId, string data);
+    public delegate void OnLoginStatus(ErrorCode errCode, string errMsg, string data);
+    public delegate void OnLogOutStatus(ErrorCode errCode, string errMsg, string data);
+    public delegate void OnNetworkStatus(ErrorCode errorCode, string errMsg, string data);
+    public delegate void OnSendMessage(ErrorCode errorCode, string errMsg, string data, int progress);
+    public delegate void OnRecvConversationList(ErrorCode errorCode, string errMsg, List<Conversation> list);
+    public delegate void OnRecvHistoryList(ErrorCode errorCode, string errMsg, List<Conversation> list);
+    public static class OpenIMSDK
     {
-#if (UNITY_IPHONE || UNITY_TVOS || UNITY_WEBGL || UNITY_SWITCH) && !UNITY_EDITOR
-        const string OPENIMDLL = "__Internal";
-#else
-        const string OPENIMDLL = "openimsdk";
-#endif
+        enum FuncBindKey
+        {
+            Conn,
+            Login,
+            Logout,
+            RecvConversationMsg,
+            RecvHistoryMessage,
+        }
+        static Dictionary<FuncBindKey, Delegate> callBackBindDic = new Dictionary<FuncBindKey, Delegate>();
+        static System.Random operationIDGen = new System.Random();
+        static string GetOperationID()
+        {
+            return operationIDGen.Next().ToString();
+        }
+        static void CallBindFunc<T1, T2>(FuncBindKey key, T1 t1, T2 t2)
+        {
+            SDKHelper.QueueOnMainThread(() =>
+            {
+                Delegate cb;
+                var suc = callBackBindDic.TryGetValue(key, out cb);
+                if (suc)
+                {
+                    cb.DynamicInvoke(t1, t2);
+                }
+            });
+        }
+        static void CallBindFunc<T1, T2, T3>(FuncBindKey key, T1 t1, T2 t2, T3 t3)
+        {
+            SDKHelper.QueueOnMainThread(() =>
+            {
+                Delegate cb;
+                var suc = callBackBindDic.TryGetValue(key, out cb);
+                if (suc)
+                {
+                    cb.DynamicInvoke(t1, t2, t3);
+                }
+            });
+        }
+        static void CallBindFunc<T1, T2, T3, T4>(FuncBindKey key, T1 t1, T2 t2, T3 t3, T4 t4)
+        {
+            SDKHelper.QueueOnMainThread(() =>
+            {
+                Delegate cb;
+                var suc = callBackBindDic.TryGetValue(key, out cb);
+                if (suc)
+                {
+                    cb.DynamicInvoke(t1, t2, t3, t4);
+                }
+            });
+        }
+        static void Register(FuncBindKey key, Delegate cb)
+        {
+            if (callBackBindDic.ContainsKey(key))
+            {
+                callBackBindDic.Remove(key);
+            }
+            callBackBindDic.Add(key, cb);
+        }
+        public static void OnConnectStatusChange(int eventId, string data)
+        {
+            CallBindFunc<int, string>(FuncBindKey.Conn, eventId, data);
+        }
+        public static int InitSDK(IMConfig config, OnConnectStatus cb)
+        {
+            Register(FuncBindKey.Conn, cb);
+            SDKHelper.Initialize();
+            Debug.Log("InitSDK  " + JsonUtil.ToJson(config));
+            return OpenIMDLL.init_sdk(OnConnectStatusChange, GetOperationID(), JsonUtility.ToJson(config));
+        }
+        public static LoginStatus GetLoginStatus()
+        {
+            return (LoginStatus)OpenIMDLL.get_login_status(GetOperationID());
+        }
+        public static void OnLoginStatusChange(int errCode, string msg, string data)
+        {
+            CallBindFunc<ErrorCode, string, string>(FuncBindKey.Login, (ErrorCode)errCode, msg, data);
+        }
+        public static void Login(string uid, string token, OnLoginStatus cb)
+        {
+            Register(FuncBindKey.Login, cb);
+            OpenIMDLL.login(OnLoginStatusChange, GetOperationID(), uid, token);
+        }
+        public static void OnLoginOut(int errCode, string msg, string data)
+        {
+            CallBindFunc<ErrorCode, string, string>(FuncBindKey.Logout, (ErrorCode)errCode, msg, data);
+        }
+        public static void Logout(OnLogOutStatus cb)
+        {
+            Register(FuncBindKey.Logout, cb);
+            OpenIMDLL.logout(OnLoginOut, GetOperationID());
+        }
+        public static void OnRecvConversationList(int errCode, string errMsg, string data)
+        {
+            var list = JsonUtil.FromJson<List<Conversation>>(data);
+            CallBindFunc<ErrorCode, string, List<Conversation>>(FuncBindKey.RecvConversationMsg, (ErrorCode)errCode, errMsg, list);
+        }
+        public static void GetConversationList(OnRecvConversationList cb)
+        {
+            Register(FuncBindKey.RecvConversationMsg, cb);
+            OpenIMDLL.get_all_conversation_list(OnRecvConversationList, GetOperationID());
+        }
+        public static void RecvAdvancedHistoryMessage(int errCode, string errMsg, string data)
+        {
+            CallBindFunc<ErrorCode, string, List<Conversation>>(FuncBindKey.RecvConversationMsg, (ErrorCode)errCode, errMsg, null);
+        }
+        public static void GetAdvancedHistoryMessageList(OnRecvHistoryList cb)
+        {
+            Register(FuncBindKey.RecvHistoryMessage, cb);
+            OpenIMDLL.get_advanced_history_message_list(RecvAdvancedHistoryMessage, GetOperationID(), "");
+        }
 
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int init_sdk(ConnectStatus cb, string operationID, string config);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void un_init_sdk(string operationID);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void login(LoginStatusChange cb, string operationID, string uid, string token);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void logout(LogOutStatus cb, string operationID);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void network_status_changed(NetworkStatus cb, string operationID);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int get_login_status(string operationID);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string get_login_user();
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_text_message(string operationID, string text);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_advanced_text_message(string operationID, string text, string messageEntityList);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_text_at_message(string operationID, string text, string atUserList, string atUsersInfo, string message);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_location_message(string operationID, string description, double longitude, double latitude);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_custom_message(string operationID, string data, string extension, string description);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_quote_message(string operationID, string text, string message);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_advanced_quote_message(string operationID, string text, string message, string messageEntityList);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_card_message(string operationID, string cardInfo);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_video_message_from_full_path(string operationID, string videoFullPath, string videoType, long duration, string snapshotFullPath);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_image_message_from_full_path(string operationID, string imageFullPath);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_sound_message_from_full_path(string operationID, string soundPath, Int64 duration);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_file_message_from_full_path(string operationID, string fileFullPath, string fileName);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_image_message(string operationID, string imagePath);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_image_message_by_url(string operationID, string sourcePicture, string bigPicture, string snapshotPicture);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_sound_message_by_url(string operationID, string soundBaseInfo);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_sound_message(string operationID, string soundPath, Int64 duration);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_video_message_by_url(string operationID, string videoBaseInfo);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_video_message(string operationID, string videoPath, string videoType, Int64 duration, string snapshotPath);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_file_message_by_url(string operationID, string fileBaseInfo);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_file_message(string operationID, string filePath, string fileName);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_merger_message(string operationID, string messageList, string title, string summaryList);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_face_message(string operationID, int index, string data);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_forward_message(string operationID, string m);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_all_conversation_list(RecvConversationMsg cb, string operationID);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_advanced_history_message_list(RecvHistoryMsg cb, string operationID, string getMessageOptions);
-        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void send_message(SendMessage cb, string operationID, string message, string recvID, string groupID, string offlinePushInfo);
     }
 }

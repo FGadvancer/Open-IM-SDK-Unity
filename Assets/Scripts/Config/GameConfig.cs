@@ -8,5 +8,6 @@ public class GameConfig : ScriptableObject
     [Header("Audio Settings")]
     public float MusicVolume = .7f;
     public float SFXVolume = .9f;
-
+    public string TestID;
+    public string TestToken;
 }

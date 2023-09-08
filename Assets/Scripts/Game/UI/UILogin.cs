@@ -19,9 +19,8 @@ public class UILogin : UILogicBase
     }
     public override void OnOpen()
     {
-
-        uid.text = Game.LocalData.LastUserID;
-        token.text = Game.LocalData.LastToken;
+        uid.text = Game.LocalData.LastUserID == "" ? Game.Config.TestID : Game.LocalData.LastUserID;
+        token.text = Game.LocalData.LastToken == "" ? Game.Config.TestToken : Game.LocalData.LastToken;
 
         OnClick(loginBtn, () =>
         {
