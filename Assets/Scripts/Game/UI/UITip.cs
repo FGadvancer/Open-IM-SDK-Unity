@@ -17,7 +17,7 @@ public class UITip : UILogicBase
         tip = GetComponent<TextMeshProUGUI>("bg/text");
         maskBtn = GetComponent<Button>("mask");
     }
-    public override void OnOpen()
+    public override void OnOpen(object userData)
     {
         maskTrans.gameObject.SetActive(false);
         msgTrans.gameObject.SetActive(false);

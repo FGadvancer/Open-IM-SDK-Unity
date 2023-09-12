@@ -37,7 +37,7 @@ public partial class UIMain : UILogicBase
         workToggle = GetComponent<Toggle>("bottom/work");
         myToggle = GetComponent<Toggle>("bottom/my");
     }
-    public override void OnOpen()
+    public override void OnOpen(object userData)
     {
         OpenChat();
         OpenMy();

@@ -7,7 +7,7 @@ public abstract class UILogicBase
 {
     public Transform UIRoot;
     public abstract void Init();
-    public abstract void OnOpen();
+    public abstract void OnOpen(object userData = null);
     public abstract void OnUpdate(float dt);
     public abstract void OnClose();
     public abstract void OnDestroy();

@@ -12,18 +12,39 @@ public static class Game
     public static EventDispator Event = null;
     public static HttpManager Http = null;
     public static LocalData LocalData = null;
+    public static Player Player = null;
     static Dictionary<Type, ProcedureBase> procedures = new Dictionary<Type, ProcedureBase>();
     public static void Init()
     {
-        var config = new IMConfig("http://125.124.195.201:10002", "ws://125.124.195.201:10001", Application.persistentDataPath, 1, true, Application.persistentDataPath, true);
-        var localDataJson = PlayerPrefs.GetString(Game.Config.LocalDataSaveName);
+        var config = new IMConfig
+        {
+            PlatformID = (int)GetPlatFormID(),
+            ApiAddr = "http://125.124.195.201:10002",
+            WsAddr = "ws://125.124.195.201:10001",
+            DataDir = Application.persistentDataPath,
+            LogLevel = 1,
+            IsLogStandardOutput = true,
+            LogFilePath = Application.persistentDataPath,
+            IsExternalExtensions = true
+        };
+        var localDataJson = PlayerPrefs.GetString(Config.LocalDataSaveName);
         Debug.Log("Load Local Data" + localDataJson);
-        Game.LocalData = new LocalData();
-        JsonUtility.FromJsonOverwrite(localDataJson, Game.LocalData);
+        LocalData = new LocalData();
+        JsonUtility.FromJsonOverwrite(localDataJson, LocalData);
+        Player = new Player(Game.LocalData.LastUserID);
         int res = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
-        Debug.Log("InitSDK res" + res);
+        Debug.Log("InitSDK res " + res);
     }
-
+    public static PlatFormID GetPlatFormID()
+    {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE || UNITY_STANDALONE_WIN
+        return PlatFormID.WindowsPlatformID;
+#elif UNITY_ANDROID
+            return PlatFormID.AndroidPadPlatformID;
+#elif UNITY_IOS
+            return PlatFormID.IOSPlatformID;
+#endif
+    }
     public static void OnConnectStatusChange(EventId id, string data)
     {
         Debug.Log(id + "  " + data);

@@ -2,9 +2,9 @@ using System;
 using System.Runtime.InteropServices;
 namespace OpenIM
 {
-    public delegate void CB_I_S_S_I(int errorCode, string errMsg, string data, int progress);
-    public delegate void CB_I_S(int eventID, string data);
-    public delegate void CB_I_S_S(int errCode, string errMsg, string data);
+    delegate void CB_I_S_S_I(int errorCode, string errMsg, string data, int progress);
+    delegate void CB_I_S(int eventID, string data);
+    delegate void CB_I_S_S(int errCode, string errMsg, string data);
     class OpenIMDLL
     {
 #if (UNITY_IPHONE || UNITY_TVOS || UNITY_WEBGL || UNITY_SWITCH) && !UNITY_EDITOR

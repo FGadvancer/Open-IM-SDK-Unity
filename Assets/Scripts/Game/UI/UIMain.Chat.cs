@@ -8,7 +8,6 @@ public partial class UIMain
 {
     LoopListView2 conversationlist;
 
-    List<Conversation> conversationData;
     public void InitChat()
     {
         conversationlist = GetComponent<LoopListView2>("chat/list");
@@ -27,7 +26,7 @@ public partial class UIMain
                 obj.IsInitHandlerCalled = true;
             }
             var item = obj.UserObjectData as ConversationItem;
-            item.SetItemInfo(conversationData[index]);
+            item.SetItemInfo(Game.Player.ConversationData[index]);
             return obj;
         });
     }
@@ -35,13 +34,13 @@ public partial class UIMain
     {
         conversationlist.Reset();
     }
-    public void OnRecvConversationList(ErrorCode err, string errMsg, List<Conversation> list)
+    public void OnRecvConversationList(ErrorCode err, string errMsg, List<LocalConversation> list)
     {
         if (err == ErrorCode.None)
         {
             if (list != null)
             {
-                conversationData = list;
+                Game.Player.ConversationData = list ;
                 RefreshList(conversationlist, list.Count);
             }
         }

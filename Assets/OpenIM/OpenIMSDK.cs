@@ -9,8 +9,8 @@ namespace OpenIM
     public delegate void OnLogOutStatus(ErrorCode errCode, string errMsg, string data);
     public delegate void OnNetworkStatus(ErrorCode errorCode, string errMsg, string data);
     public delegate void OnSendMessage(ErrorCode errorCode, string errMsg, string data, int progress);
-    public delegate void OnRecvConversationList(ErrorCode errorCode, string errMsg, List<Conversation> list);
-    public delegate void OnRecvHistoryList(ErrorCode errorCode, string errMsg, List<Conversation> list);
+    public delegate void OnRecvConversationList(ErrorCode errorCode, string errMsg, List<LocalConversation> list);
+    public delegate void OnRecvHistoryList(ErrorCode errorCode, string errMsg, AdvancedHistoryMessageData list);
     public static class OpenIMSDK
     {
         enum FuncBindKey
@@ -79,7 +79,6 @@ namespace OpenIM
         {
             Register(FuncBindKey.Conn, cb);
             SDKHelper.Initialize();
-            Debug.Log("InitSDK  " + JsonUtil.ToJson(config));
             return OpenIMDLL.init_sdk(OnConnectStatusChange, GetOperationID(), JsonUtility.ToJson(config));
         }
         public static LoginStatus GetLoginStatus()
@@ -106,8 +105,8 @@ namespace OpenIM
         }
         public static void OnRecvConversationList(int errCode, string errMsg, string data)
         {
-            var list = JsonUtil.FromJson<List<Conversation>>(data);
-            CallBindFunc<ErrorCode, string, List<Conversation>>(FuncBindKey.RecvConversationMsg, (ErrorCode)errCode, errMsg, list);
+            var list = JsonUtil.FromJson<List<LocalConversation>>(data);
+            CallBindFunc<ErrorCode, string, List<LocalConversation>>(FuncBindKey.RecvConversationMsg, (ErrorCode)errCode, errMsg, list);
         }
         public static void GetConversationList(OnRecvConversationList cb)
         {
@@ -116,12 +115,13 @@ namespace OpenIM
         }
         public static void RecvAdvancedHistoryMessage(int errCode, string errMsg, string data)
         {
-            CallBindFunc<ErrorCode, string, List<Conversation>>(FuncBindKey.RecvConversationMsg, (ErrorCode)errCode, errMsg, null);
+            var msgData = errCode == (int)ErrorCode.None ? JsonUtil.FromJson<AdvancedHistoryMessageData>(data) : null;
+            CallBindFunc<ErrorCode, string, AdvancedHistoryMessageData>(FuncBindKey.RecvHistoryMessage, (ErrorCode)errCode, errMsg, msgData);
         }
-        public static void GetAdvancedHistoryMessageList(OnRecvHistoryList cb)
+        public static void GetAdvancedHistoryMessageList(OnRecvHistoryList cb, GetAdvancedHistoryMessageListParams args)
         {
             Register(FuncBindKey.RecvHistoryMessage, cb);
-            OpenIMDLL.get_advanced_history_message_list(RecvAdvancedHistoryMessage, GetOperationID(), "");
+            OpenIMDLL.get_advanced_history_message_list(RecvAdvancedHistoryMessage, GetOperationID(), JsonUtil.ToJson(args));
         }
 
     }

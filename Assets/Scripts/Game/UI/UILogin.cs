@@ -17,7 +17,7 @@ public class UILogin : UILogicBase
     public override void OnDestroy()
     {
     }
-    public override void OnOpen()
+    public override void OnOpen(object userData)
     {
         uid.text = Game.LocalData.LastUserID == "" ? Game.Config.TestID : Game.LocalData.LastUserID;
         token.text = Game.LocalData.LastToken == "" ? Game.Config.TestToken : Game.LocalData.LastToken;
@@ -31,6 +31,7 @@ public class UILogin : UILogicBase
     {
         if (errCode == ErrorCode.LoginRepeatError)
         {
+            Game.Player.UserID = uid.text;
             Game.ChangeProcecure<ProcedureMain>();
         }
         else if (errCode == ErrorCode.None)

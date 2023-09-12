@@ -21,9 +21,9 @@ public class UILogicComponent : MonoBehaviour
         gameObject.SetActive(false);
         this.isVisiable = false;
     }
-    public void OnOpen()
+    public void OnOpen(object userData = null)
     {
-        logic.OnOpen();
+        logic.OnOpen(userData);
         gameObject.SetActive(true);
         this.isVisiable = true;
     }

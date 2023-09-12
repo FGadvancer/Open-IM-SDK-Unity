@@ -61,12 +61,12 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ShowUI(string name)
+    public void ShowUI(string name, object userData = null)
     {
         UIItem ui;
         if (mUIItemDic.TryGetValue(name, out ui))
         {
-            ui.logic.OnOpen();
+            ui.logic.OnOpen(userData);
         }
         else
         {

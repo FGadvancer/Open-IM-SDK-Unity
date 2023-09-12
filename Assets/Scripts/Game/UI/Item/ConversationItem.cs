@@ -13,6 +13,7 @@ public class ConversationItem
     TextMeshProUGUI lastMessage;
     TextMeshProUGUI time;
 
+    Button btn;
     public ConversationItem(UILogicBase ui, Transform parent)
     {
         this.ui = ui;
@@ -21,23 +22,29 @@ public class ConversationItem
         name = ui.GetComponent<TextMeshProUGUI>(parent, "name");
         lastMessage = ui.GetComponent<TextMeshProUGUI>(parent, "message");
         time = ui.GetComponent<TextMeshProUGUI>(parent, "time");
+        btn = ui.GetComponent<Button>(parent, "");
     }
 
-    public void SetItemInfo(Conversation conversation)
+    public void SetItemInfo(LocalConversation conversation)
     {
+        Debug.Log(conversation.UserID);
         // Debug.Log(JsonUtil.ToJson(conversation));
-        Game.Http.SetImage(icon, conversation.faceURL);
-        name.text = conversation.showName;
+        Game.Http.SetImage(icon, conversation.FaceURL);
+        name.text = conversation.ShowName;
         var msg = conversation.GetLatestMsg();
         // Debug.Log(JsonUtil.ToJson(msg));
         if (msg != null)
         {
-            lastMessage.text = msg.textElem.content;
+            lastMessage.text = msg.TextElem.Content;
         }
         else
         {
             lastMessage.text = "";
         }
-        time.text = StringUtils.TimeStampToStr1(conversation.latestMsgSendTime);
+        time.text = StringUtils.TimeStampToStr1(conversation.LatestMsgSendTime);
+        ui.OnClick(btn, () =>
+        {
+            Game.UI.ShowUI("Chat", conversation);
+        });
     }
 }
