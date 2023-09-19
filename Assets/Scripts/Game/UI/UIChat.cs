@@ -31,7 +31,7 @@ public class UIChat : UILogicBase
         name.text = conversation.ShowName;
         var args = new GetAdvancedHistoryMessageListParams()
         {
-            UserID = Game.LocalData.LastUserID,
+            UserID = Game.Player.UserID,
             LastMinSeq = conversation.MinSeq,
             GroupID = conversation.GroupID,
             ConversationID = conversation.ConversationID,
@@ -42,6 +42,21 @@ public class UIChat : UILogicBase
         {
             Game.UI.CloseUI("Chat");
         });
+        OnClick(sendBtn, () =>
+        {
+            if (inputMsg.text == "")
+            {
+                Game.UI.ShowTip("Message Cant Empty", 2.0f);
+                return;
+            }
+            var message = OpenIMSDK.CreateTextMessage(inputMsg.text);
+            Debug.Log(message);
+            for (int i = 0; i < 1000; i++)
+            {
+                OpenIMSDK.SendMessage(message, conversation.UserID, conversation.GroupID, "{}", OnSendMessage);
+            }
+        });
+
         chatList.InitListView(0, (view, index) =>
         {
             if (index < 0) return null;
@@ -67,8 +82,15 @@ public class UIChat : UILogicBase
             RefreshList(chatList, chatData.MessageList.Length);
         }
     }
-    public void OnRecvHistoryMessage(ErrorCode code, string errMsg, AdvancedHistoryMessageData data)
+
+    public void OnSendMessage(string operationId, ErrorCode errorCode, string errMsg, string data, int progress)
     {
+        Debug.Log(operationId + errorCode + errMsg + data + progress);
+    }
+
+    public void OnRecvHistoryMessage(string operationId, ErrorCode code, string errMsg, AdvancedHistoryMessageData data)
+    {
+        Debug.Log(operationId + "　" + code + " " + errMsg);
         if (code == ErrorCode.None)
         {
             chatData = data;
@@ -77,7 +99,7 @@ public class UIChat : UILogicBase
         }
         else
         {
-            Game.UI.ShowTip(errMsg, 0.2f, false, false);
+            Game.UI.ShowTip(errMsg, 2f, false, false);
         }
     }
     public override void OnUpdate(float dt)

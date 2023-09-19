@@ -2,8 +2,10 @@ using System;
 using System.Runtime.InteropServices;
 namespace OpenIM
 {
-    delegate void CB_I_S_S_I(int errorCode, string errMsg, string data, int progress);
+    delegate void print(string info);
+    delegate void CB_S_I_S_S_I(string operationId, int errorCode, string errMsg, string data, int progress);
     delegate void CB_I_S(int eventID, string data);
+    delegate void CB_S_I_S_S(string operationID, int errCode, string errMsg, string data);
     delegate void CB_I_S_S(int errCode, string errMsg, string data);
     class OpenIMDLL
     {
@@ -12,23 +14,45 @@ namespace OpenIM
 #else
         const string OPENIMDLL = "openimsdk";
 #endif
-
+        #region Init
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int init_sdk(CB_I_S cb, string operationID, string config);
+        public static extern void set_print(print print);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool init_sdk(CB_I_S cb, string operationID, string config);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void un_init_sdk(string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void login(CB_I_S_S cb, string operationID, string uid, string token);
+        public static extern void login(CB_S_I_S_S cb, string operationID, string uid, string token);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void logout(CB_I_S_S cb, string operationID);
+        public static extern void logout(CB_S_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void network_status_changed(CB_I_S_S cb, string operationID);
+        public static extern void network_status_changed(CB_S_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int get_login_status(string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern string get_login_user();
+        #endregion
+
+        #region Global Listen
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_text_message(string operationID, string text);
+        public static extern void set_group_listener(CB_I_S cb);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void set_conversation_listener(CB_I_S cb);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void set_advanced_msg_listener(CB_I_S cb);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void set_batch_msg_listener(CB_I_S cb);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void set_user_listener(CB_I_S cb);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void set_friend_listener(CB_I_S cb);
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void set_custom_business_listener(CB_I_S cb);
+        #endregion
+
+        #region SendMessge
+        [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr create_text_message(string operationID, string text);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern string create_advanced_text_message(string operationID, string text, string messageEntityList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
@@ -73,117 +97,132 @@ namespace OpenIM
         public static extern string create_face_message(string operationID, int index, string data);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern string create_forward_message(string operationID, string m);
+
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_all_conversation_list(CB_I_S_S cb, string operationID);
+        public static extern void send_message(CB_S_I_S_S_I cb, string operationID, string message, string recvID, string groupID, string offlinePushInfo);
+        #endregion
+
+        #region Message List
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_advanced_history_message_list(CB_I_S_S cb, string operationID, string getMessageOptions);
+        public static extern void get_all_conversation_list(CB_S_I_S_S cb, string operationID);
+
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void send_message(CB_I_S_S_I cb, string operationID, string message, string recvID, string groupID, string offlinePushInfo);
+        public static extern void get_advanced_history_message_list(CB_S_I_S_S cb, string operationID, string getMessageOptions);
+        #endregion
+
+        #region UserInfo
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_users_info(CB_I_S_S cCallback, string operationID, string userIDs);
+        public static extern void get_users_info(CB_I_S_S cb, string operationID, string userIDs);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_users_info_from_srv(CB_I_S_S cCallback, string operationID, string userIDs);
+        public static extern void get_users_info_from_srv(CB_I_S_S cb, string operationID, string userIDs);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_self_info(CB_I_S_S cCallback, string operationID, string userInfo);
+        public static extern void set_self_info(CB_I_S_S cb, string operationID, string userInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_self_user_info(CB_I_S_S cCallback, string operationID);
+        public static extern void get_self_user_info(CB_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void update_msg_sender_info(CB_I_S_S cCallback, string operationID, string nickname, string faceURL);
+        public static extern void update_msg_sender_info(CB_I_S_S cb, string operationID, string nickname, string faceURL);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void subscribe_users_status(CB_I_S_S cCallback, string operationID, string userIDs);
+        public static extern void subscribe_users_status(CB_I_S_S cb, string operationID, string userIDs);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void unsubscribe_users_status(CB_I_S_S cCallback, string operationID, string userIDs);
+        public static extern void unsubscribe_users_status(CB_I_S_S cb, string operationID, string userIDs);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_subscribe_users_status(CB_I_S_S cCallback, string operationID);
+        public static extern void get_subscribe_users_status(CB_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_user_status(CB_I_S_S cCallback, string operationID, string userIDs);
+        public static extern void get_user_status(CB_I_S_S cb, string operationID, string userIDs);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_specified_friends_info(CB_I_S_S cCallback, string operationID, string userIDList);
+        public static extern void get_specified_friends_info(CB_I_S_S cb, string operationID, string userIDList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_friend_list(CB_I_S_S cCallback, string operationID);
+        public static extern void get_friend_list(CB_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_friend_list_page(CB_I_S_S cCallback, string operationID, int offset, int count);
+        public static extern void get_friend_list_page(CB_I_S_S cb, string operationID, int offset, int count);
+        #endregion
+
+        #region Friend
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void search_friends(CB_I_S_S cCallback, string operationID, string searchParam);
+        public static extern void search_friends(CB_I_S_S cb, string operationID, string searchParam);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void check_friend(CB_I_S_S cCallback, string operationID, string userIDList);
+        public static extern void check_friend(CB_I_S_S cb, string operationID, string userIDList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void add_friend(CB_I_S_S cCallback, string operationID, string userIDReqMsg);
+        public static extern void add_friend(CB_I_S_S cb, string operationID, string userIDReqMsg);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_friend_remark(CB_I_S_S cCallback, string operationID, string userIDRemark);
+        public static extern void set_friend_remark(CB_I_S_S cb, string operationID, string userIDRemark);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void delete_friend(CB_I_S_S cCallback, string operationID, string friendUserID);
+        public static extern void delete_friend(CB_I_S_S cb, string operationID, string friendUserID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_friend_application_list_as_recipient(CB_I_S_S cCallback, string operationID);
+        public static extern void get_friend_application_list_as_recipient(CB_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_friend_application_list_as_applicant(CB_I_S_S cCallback, string operationID);
+        public static extern void get_friend_application_list_as_applicant(CB_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void accept_friend_application(CB_I_S_S cCallback, string operationID, string userIDHandleMsg);
+        public static extern void accept_friend_application(CB_I_S_S cb, string operationID, string userIDHandleMsg);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void refuse_friend_application(CB_I_S_S cCallback, string operationID, string userIDHandleMsg);
+        public static extern void refuse_friend_application(CB_I_S_S cb, string operationID, string userIDHandleMsg);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void add_black(CB_I_S_S cCallback, string operationID, string blackUserID);
+        public static extern void add_black(CB_I_S_S cb, string operationID, string blackUserID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_black_list(CB_I_S_S cCallback, string operationID);
+        public static extern void get_black_list(CB_I_S_S cb, string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void remove_black(CB_I_S_S cCallback, string operationID, string removeUserID);
+        public static extern void remove_black(CB_I_S_S cb, string operationID, string removeUserID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void create_group(CB_I_S_S cCallback, string cOperationID, string cGroupReqInfo);
+        #endregion
+
+        #region Group
+        public static extern void create_group(CB_I_S_S cb, string cOperationID, string cGroupReqInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void join_group(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cReqMsg, int cJoinSource);
+        public static extern void join_group(CB_I_S_S cb, string cOperationID, string cGroupID, string cReqMsg, int cJoinSource);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void quit_group(CB_I_S_S cCallback, string cOperationID, string cGroupID);
+        public static extern void quit_group(CB_I_S_S cb, string cOperationID, string cGroupID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void dismiss_group(CB_I_S_S cCallback, string cOperationID, string cGroupID);
+        public static extern void dismiss_group(CB_I_S_S cb, string cOperationID, string cGroupID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void change_group_mute(CB_I_S_S cCallback, string cOperationID, string cGroupID, int cIsMute);
+        public static extern void change_group_mute(CB_I_S_S cb, string cOperationID, string cGroupID, int cIsMute);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void change_group_member_mute(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cUserID, int cMutedSeconds);
+        public static extern void change_group_member_mute(CB_I_S_S cb, string cOperationID, string cGroupID, string cUserID, int cMutedSeconds);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_group_member_role_level(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cUserID, int cRoleLevel);
+        public static extern void set_group_member_role_level(CB_I_S_S cb, string cOperationID, string cGroupID, string cUserID, int cRoleLevel);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_group_member_info(CB_I_S_S cCallback, string cOperationID, string cGroupMemberInfo);
+        public static extern void set_group_member_info(CB_I_S_S cb, string cOperationID, string cGroupMemberInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_joined_group_list(CB_I_S_S cCallback, string cOperationID);
+        public static extern void get_joined_group_list(CB_I_S_S cb, string cOperationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_specified_groups_info(CB_I_S_S cCallback, string cOperationID, string cGroupIDList);
+        public static extern void get_specified_groups_info(CB_I_S_S cb, string cOperationID, string cGroupIDList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void search_groups(CB_I_S_S cCallback, string cOperationID, string cSearchParam);
+        public static extern void search_groups(CB_I_S_S cb, string cOperationID, string cSearchParam);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_group_info(CB_I_S_S cCallback, string cOperationID, string cGroupInfo);
+        public static extern void set_group_info(CB_I_S_S cb, string cOperationID, string cGroupInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_group_verification(CB_I_S_S cCallback, string cOperationID, string cGroupID, int cVerification);
+        public static extern void set_group_verification(CB_I_S_S cb, string cOperationID, string cGroupID, int cVerification);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_group_look_member_info(CB_I_S_S cCallback, string cOperationID, string cGroupID, int cRule);
+        public static extern void set_group_look_member_info(CB_I_S_S cb, string cOperationID, string cGroupID, int cRule);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_group_apply_member_friend(CB_I_S_S cCallback, string cOperationID, string cGroupID, int cRule);
+        public static extern void set_group_apply_member_friend(CB_I_S_S cb, string cOperationID, string cGroupID, int cRule);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_group_member_list(CB_I_S_S cCallback, string cOperationID, string cGroupID, int cFilter, int cOffset, int cCount);
+        public static extern void get_group_member_list(CB_I_S_S cb, string cOperationID, string cGroupID, int cFilter, int cOffset, int cCount);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_group_member_owner_and_admin(CB_I_S_S cCallback, string cOperationID, string cGroupID);
+        public static extern void get_group_member_owner_and_admin(CB_I_S_S cb, string cOperationID, string cGroupID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_group_member_list_by_join_time_filter(CB_I_S_S cCallback, string cOperationID, string cGroupID, int cOffset, int cCount, Int64 cJoinTimeBegin, Int64 cJoinTimeEnd, string cFilterUserIDList);
+        public static extern void get_group_member_list_by_join_time_filter(CB_I_S_S cb, string cOperationID, string cGroupID, int cOffset, int cCount, Int64 cJoinTimeBegin, Int64 cJoinTimeEnd, string cFilterUserIDList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_specified_group_members_info(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cUserIDList);
+        public static extern void get_specified_group_members_info(CB_I_S_S cb, string cOperationID, string cGroupID, string cUserIDList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void kick_group_member(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cReason, string cUserIDList);
+        public static extern void kick_group_member(CB_I_S_S cb, string cOperationID, string cGroupID, string cReason, string cUserIDList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void transfer_group_owner(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cNewOwnerUserID);
+        public static extern void transfer_group_owner(CB_I_S_S cb, string cOperationID, string cGroupID, string cNewOwnerUserID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void invite_user_to_group(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cReason, string cUserIDList);
+        public static extern void invite_user_to_group(CB_I_S_S cb, string cOperationID, string cGroupID, string cReason, string cUserIDList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_group_application_list_as_recipient(CB_I_S_S cCallback, string cOperationID);
+        public static extern void get_group_application_list_as_recipient(CB_I_S_S cb, string cOperationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void get_group_application_list_as_applicant(CB_I_S_S cCallback, string cOperationID);
+        public static extern void get_group_application_list_as_applicant(CB_I_S_S cb, string cOperationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void accept_group_application(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cFromUserID, string cHandleMsg);
+        public static extern void accept_group_application(CB_I_S_S cb, string cOperationID, string cGroupID, string cFromUserID, string cHandleMsg);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void refuse_group_application(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cFromUserID, string cHandleMsg);
+        public static extern void refuse_group_application(CB_I_S_S cb, string cOperationID, string cGroupID, string cFromUserID, string cHandleMsg);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void set_group_member_nickname(CB_I_S_S cCallback, string cOperationID, string cGroupID, string cUserID, string cGroupMemberNickname);
+        public static extern void set_group_member_nickname(CB_I_S_S cb, string cOperationID, string cGroupID, string cUserID, string cGroupMemberNickname);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void search_group_members(CB_I_S_S cCallback, string cOperationID, string cSearchParam);
+        public static extern void search_group_members(CB_I_S_S cb, string cOperationID, string cSearchParam);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void is_join_group(CB_I_S_S cCallback, string cOperationID, string cGroupID);
+        public static extern void is_join_group(CB_I_S_S cb, string cOperationID, string cGroupID);
+        #endregion
     }
 }

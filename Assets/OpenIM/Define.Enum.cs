@@ -3,6 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace OpenIM
 {
+    public enum ErrorCode
+    {
+        None = 0,
+        LoginRepeatError = 10102
+    }
+    public enum EventId
+    {
+        CONNECTING,
+        CONNECT_SUCCESS,
+        CONNECT_FAILED,
+        KICKED_OFFLINE,
+        USER_TOKEN_EXPIRED,
+    }
     public enum LoginStatus
     {
         Logout = 1,

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using OpenIM;
+using UnityEditor;
+
 public static class Game
 {
     public static GameEntry Entry = null;
@@ -11,7 +13,6 @@ public static class Game
     public static EffectMgr Effect = null;
     public static EventDispator Event = null;
     public static HttpManager Http = null;
-    public static LocalData LocalData = null;
     public static Player Player = null;
     static Dictionary<Type, ProcedureBase> procedures = new Dictionary<Type, ProcedureBase>();
     public static void Init()
@@ -27,14 +28,36 @@ public static class Game
             LogFilePath = Application.persistentDataPath,
             IsExternalExtensions = true
         };
-        var localDataJson = PlayerPrefs.GetString(Config.LocalDataSaveName);
-        Debug.Log("Load Local Data" + localDataJson);
-        LocalData = new LocalData();
-        JsonUtility.FromJsonOverwrite(localDataJson, LocalData);
-        Player = new Player(Game.LocalData.LastUserID);
-        int res = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
-        Debug.Log("InitSDK res " + res);
+        Player = new Player(Game.Config.TestID);
+        bool suc = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
+        Debug.Log("InitSDK res " + suc);
+        if (!suc)
+        {
+            Debug.LogError("Init SDK Error");
+            EditorApplication.isPlaying = false;
+            return;
+        }
+        OpenIMSDK.SetGroupListener(OnRecvGroup);
+        OpenIMSDK.SetConversationListener(OnRecvConversation);
+        OpenIMSDK.SetAdvancedMsgListener(OnRecvAdvancedMsg);
     }
+    public static void Destroy()
+    {
+        OpenIMSDK.UnInitSDK();
+    }
+    public static void OnRecvConversation(EventId eid, string data)
+    {
+
+    }
+    public static void OnRecvAdvancedMsg(EventId eid, string data)
+    {
+
+    }
+    public static void OnRecvGroup(EventId eid, string data)
+    {
+
+    }
+
     public static PlatFormID GetPlatFormID()
     {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE || UNITY_STANDALONE_WIN

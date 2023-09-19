@@ -2,7 +2,6 @@
 
 public class GameConfig : ScriptableObject
 {
-    public string LocalDataSaveName = "LocalData";
     [Header("Application Settings")]
     public int FrameRate = 60;
     [Header("Audio Settings")]

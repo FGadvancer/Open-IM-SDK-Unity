@@ -41,12 +41,8 @@ public class GameEntry : MonoBehaviour
 
     void OnDestroy()
     {
+        Game.Destroy();
         Debug.Log(" GameEntry Destroy()");
-        if (Game.LocalData != null)
-        {
-            Debug.Log(" GameEntry SaveLocalData" + JsonUtility.ToJson(Game.LocalData));
-            PlayerPrefs.SetString(Game.Config.LocalDataSaveName, JsonUtility.ToJson(Game.LocalData));
-        }
     }
 
     public void ChangeProcedure(ProcedureBase procedure)

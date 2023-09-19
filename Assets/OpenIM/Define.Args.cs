@@ -64,4 +64,25 @@ namespace OpenIM
         [JsonProperty("count")]
         public int Count;
     }
+
+
+    //     public class OfflinePushInfo
+    //     {
+    //         state protoimpl.MessageState
+
+    //         sizeCache protoimpl.SizeCache
+    //         unknownFields protoimpl.UnknownFields
+
+    //         Title         string `protobuf:"bytes,1,opt,name=title,proto3" json:"title"`
+
+    //         Desc          string `protobuf:"bytes,2,opt,name=desc,proto3" json:"desc"`
+
+    //         Ex            string `protobuf:"bytes,3,opt,name=ex,proto3" json:"ex"`
+
+    //         IOSPushSound  string `protobuf:"bytes,4,opt,name=iOSPushSound,proto3" json:"iOSPushSound"`
+
+    //         IOSBadgeCount bool   `protobuf:"varint,5,opt,name=iOSBadgeCount,proto3" json:"iOSBadgeCount"`
+
+    //         SignalInfo    string `protobuf:"bytes,6,opt,name=signalInfo,proto3" json:"signalInfo"`
+    // }
 }

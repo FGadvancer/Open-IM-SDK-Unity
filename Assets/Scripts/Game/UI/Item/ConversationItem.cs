@@ -27,8 +27,6 @@ public class ConversationItem
 
     public void SetItemInfo(LocalConversation conversation)
     {
-        Debug.Log(conversation.UserID);
-        // Debug.Log(JsonUtil.ToJson(conversation));
         Game.Http.SetImage(icon, conversation.FaceURL);
         name.text = conversation.ShowName;
         var msg = conversation.GetLatestMsg();
