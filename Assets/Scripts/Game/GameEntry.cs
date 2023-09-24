@@ -42,7 +42,6 @@ public class GameEntry : MonoBehaviour
     void OnDestroy()
     {
         Game.Destroy();
-        Debug.Log(" GameEntry Destroy()");
     }
 
     public void ChangeProcedure(ProcedureBase procedure)

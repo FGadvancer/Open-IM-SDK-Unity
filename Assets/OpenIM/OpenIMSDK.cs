@@ -96,7 +96,7 @@ namespace OpenIM
         }
         public static void OnConnectStatusChange(int eventId, string data)
         {
-            CallBindFunc<int, string>(FuncBindKey.Conn, eventId, data);
+            CallBindFunc(FuncBindKey.Conn, eventId, data);
         }
         static void Print(string info)
         {
@@ -104,9 +104,9 @@ namespace OpenIM
         }
         public static bool InitSDK(IMConfig config, OnConnectStatus cb)
         {
+            SDKHelper.Initialize();
             OpenIMDLL.set_print(Print);
             Register(FuncBindKey.Conn, cb);
-            SDKHelper.Initialize();
             var _operationID = GetOperationID();
             var _config = JsonUtility.ToJson(config);
             return OpenIMDLL.init_sdk(OnConnectStatusChange, _operationID, _config);
@@ -121,7 +121,7 @@ namespace OpenIM
         }
         public static void OnLoginStatusChange(string operationId, int errCode, string msg, string data)
         {
-            CallBindFunc<ErrorCode, string, string>(FuncBindKey.Login, (ErrorCode)errCode, msg, data);
+            CallBindFunc(FuncBindKey.Login, (ErrorCode)errCode, msg, data);
         }
         public static void Login(string uid, string token, OnLoginStatus cb)
         {
@@ -130,7 +130,7 @@ namespace OpenIM
         }
         public static void OnLoginOut(string operationId, int errCode, string msg, string data)
         {
-            CallBindFunc<ErrorCode, string, string>(FuncBindKey.Logout, (ErrorCode)errCode, msg, data);
+            CallBindFunc(FuncBindKey.Logout, (ErrorCode)errCode, msg, data);
         }
         public static void Logout(OnLogOutStatus cb)
         {
@@ -140,7 +140,7 @@ namespace OpenIM
         public static void OnRecvConversationList(string operationID, int errCode, string errMsg, string data)
         {
             var list = JsonUtil.FromJson<List<LocalConversation>>(data);
-            CallBindFunc<ErrorCode, string, List<LocalConversation>>(FuncBindKey.RecvConversationMsg, (ErrorCode)errCode, errMsg, list);
+            CallBindFunc(FuncBindKey.RecvConversationMsg, (ErrorCode)errCode, errMsg, list);
         }
         public static void GetConversationList(OnRecvConversationList cb)
         {
@@ -151,33 +151,34 @@ namespace OpenIM
         public static void RecvAdvancedHistoryMessage(string operationId, int errCode, string errMsg, string data)
         {
             var msgData = errCode == (int)ErrorCode.None ? JsonUtil.FromJson<AdvancedHistoryMessageData>(data) : null;
-            CallBindFunc<string, ErrorCode, string, AdvancedHistoryMessageData>(FuncBindKey.RecvHistoryMessage, operationId, (ErrorCode)errCode, errMsg, msgData);
+            CallBindFunc(FuncBindKey.RecvHistoryMessage, operationId, (ErrorCode)errCode, errMsg, msgData);
         }
         public static void GetAdvancedHistoryMessageList(OnRecvHistoryList cb, GetAdvancedHistoryMessageListParams args)
         {
             Register(FuncBindKey.RecvHistoryMessage, cb);
             OpenIMDLL.get_advanced_history_message_list(RecvAdvancedHistoryMessage, GetOperationID(), JsonUtil.ToJson(args));
         }
-        public static void OnGroupListener(int eId, string data)
+        public static void OnGroupListener(int eid, string data)
         {
-            Debug.Log(eId);
-            Debug.Log(data);
+            CallBindFunc(FuncBindKey.GroupListener, (EventId)eid, data);
         }
         public static void SetGroupListener(GlobalListener cb)
         {
             Register(FuncBindKey.GroupListener, cb);
             OpenIMDLL.set_group_listener(OnGroupListener);
         }
-        static void OnConversationListener(int eId, string data)
+        static void OnConversationListener(int eid, string data)
         {
+            CallBindFunc(FuncBindKey.ConversitionListener, (EventId)eid, data);
         }
         public static void SetConversationListener(GlobalListener cb)
         {
             Register(FuncBindKey.ConversitionListener, cb);
             OpenIMDLL.set_conversation_listener(OnConversationListener);
         }
-        static void OnAdvancedMsgListener(int eId, string data)
+        static void OnAdvancedMsgListener(int eid, string data)
         {
+            CallBindFunc(FuncBindKey.AdvancedMsgListener, (EventId)eid, data);
         }
         public static void SetAdvancedMsgListener(GlobalListener cb)
         {
@@ -189,23 +190,19 @@ namespace OpenIM
         {
             IntPtr strPtr = OpenIMDLL.create_text_message(GetOperationID(), text);
             string res = Marshal.PtrToStringAnsi(strPtr);
+            // TODO 导致闪退
+            // Marshal.FreeHGlobal(strPtr);
             return res;
         }
 
         static void OnSendMessage(string operationId, int errorCode, string errMsg, string data, int progress)
         {
-            CallBindFunc<string, ErrorCode, string, string, int>(FuncBindKey.SendMessage, operationId, (ErrorCode)errorCode, errMsg, data, progress);
+            CallBindFunc(FuncBindKey.SendMessage, operationId, (ErrorCode)errorCode, errMsg, data, progress);
         }
-
         public static void SendMessage(string messageFlag, string recvId, string groupId, string offlinePushInfo, SendMessage cb)
         {
             Register(FuncBindKey.SendMessage, cb);
             var opid = GetOperationID();
-            Debug.Log(opid);
-            Debug.Log(messageFlag);
-            Debug.Log(recvId);
-            Debug.Log(groupId);
-            Debug.Log(offlinePushInfo);
             OpenIMDLL.send_message(OnSendMessage, opid, messageFlag, recvId, groupId, offlinePushInfo);
         }
     }

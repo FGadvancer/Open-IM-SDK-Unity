@@ -11,15 +11,14 @@ public class UIChat : UILogicBase
     TMP_InputField inputMsg;
     Button sendBtn;
     Button closeBtn;
-
     LocalConversation conversation;
-    AdvancedHistoryMessageData chatData;
+    List<MsgStruct> msgDatas;
     public override void Init()
     {
         name = GetComponent<TextMeshProUGUI>("name");
         chatList = GetComponent<LoopListView2>("list");
-        inputMsg = GetComponent<TMP_InputField>("message");
-        sendBtn = GetComponent<Button>("send");
+        inputMsg = GetComponent<TMP_InputField>("bottom/message");
+        sendBtn = GetComponent<Button>("bottom/send");
         closeBtn = GetComponent<Button>("close");
     }
     public override void OnDestroy()
@@ -29,15 +28,7 @@ public class UIChat : UILogicBase
     {
         conversation = userData as LocalConversation;
         name.text = conversation.ShowName;
-        var args = new GetAdvancedHistoryMessageListParams()
-        {
-            UserID = Game.Player.UserID,
-            LastMinSeq = conversation.MinSeq,
-            GroupID = conversation.GroupID,
-            ConversationID = conversation.ConversationID,
-            StartClientMsgID = "",
-            Count = 10,
-        };
+
         OnClick(closeBtn, () =>
         {
             Game.UI.CloseUI("Chat");
@@ -50,17 +41,14 @@ public class UIChat : UILogicBase
                 return;
             }
             var message = OpenIMSDK.CreateTextMessage(inputMsg.text);
-            Debug.Log(message);
-            for (int i = 0; i < 1000; i++)
-            {
-                OpenIMSDK.SendMessage(message, conversation.UserID, conversation.GroupID, "{}", OnSendMessage);
-            }
+            OpenIMSDK.SendMessage(message, conversation.UserID, conversation.GroupID, "{}", OnSendMessage);
+            inputMsg.text = "";
         });
 
         chatList.InitListView(0, (view, index) =>
         {
             if (index < 0) return null;
-            var data = chatData.MessageList[index];
+            var data = msgDatas[index];
             bool isSelf = data.SendID == Game.Player.UserID;
             var obj = view.NewListViewItem(isSelf ? "item2" : "item1");
             if (!obj.IsInitHandlerCalled)
@@ -72,30 +60,57 @@ public class UIChat : UILogicBase
             item.SetItemInfo(isSelf, data);
             return obj;
         });
+
         if (!Game.Player.HasHistory(conversation.UserID))
         {
+            var args = new GetAdvancedHistoryMessageListParams()
+            {
+                UserID = Game.Player.UserID,
+                LastMinSeq = conversation.MinSeq,
+                GroupID = conversation.GroupID,
+                ConversationID = conversation.ConversationID,
+                StartClientMsgID = "",
+                Count = 10,
+            };
             OpenIMSDK.GetAdvancedHistoryMessageList(OnRecvHistoryMessage, args);
         }
         else
         {
-            chatData = Game.Player.GetHistoryMessage(conversation.UserID);
-            RefreshList(chatList, chatData.MessageList.Length);
+            msgDatas = Game.Player.GetMsgRecord(conversation.UserID);
+            RefreshList(chatList, msgDatas.Count, msgDatas.Count - 1, 0);
         }
     }
 
     public void OnSendMessage(string operationId, ErrorCode errorCode, string errMsg, string data, int progress)
     {
-        Debug.Log(operationId + errorCode + errMsg + data + progress);
+        if (errorCode != ErrorCode.None)
+        {
+            Debug.Log(errorCode + "  " + errMsg);
+            Game.UI.ShowError(errMsg, 1.0f, false, false);
+            return;
+        }
+        Debug.Log("Recv => " + data);
+        var msg = JsonUtil.FromJson<MsgStruct>(data);
+        if (msg != null)
+        {
+            if (msgDatas[msgDatas.Count - 1].ClientMsgID != msg.ClientMsgID)
+            {
+                Game.Player.AddMsgRecord(conversation.UserID, msg);
+                RefreshList(chatList, msgDatas.Count, msgDatas.Count - 1, 0);
+            }
+        }
     }
 
     public void OnRecvHistoryMessage(string operationId, ErrorCode code, string errMsg, AdvancedHistoryMessageData data)
     {
-        Debug.Log(operationId + "　" + code + " " + errMsg);
         if (code == ErrorCode.None)
         {
-            chatData = data;
-            Game.Player.AddHistoryMessage(conversation.UserID, data);
-            RefreshList(chatList, data.MessageList.Length);
+            foreach (var msg in data.MessageList)
+            {
+                Game.Player.AddMsgRecord(conversation.UserID, msg);
+            }
+            msgDatas = Game.Player.GetMsgRecord(conversation.UserID);
+            RefreshList(chatList, msgDatas.Count, msgDatas.Count - 1, 0);
         }
         else
         {

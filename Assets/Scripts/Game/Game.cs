@@ -28,7 +28,7 @@ public static class Game
             LogFilePath = Application.persistentDataPath,
             IsExternalExtensions = true
         };
-        Player = new Player(Game.Config.TestID);
+        Player = new Player(Config.TestID);
         bool suc = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
         Debug.Log("InitSDK res " + suc);
         if (!suc)
@@ -43,19 +43,33 @@ public static class Game
     }
     public static void Destroy()
     {
+        OpenIMSDK.Logout((errcode, errmsg, data) =>
+        {
+            Debug.Log("OnLogOut  " + errcode + errmsg + data);
+        });
         OpenIMSDK.UnInitSDK();
+        Debug.Log("UnInitSDK");
     }
     public static void OnRecvConversation(EventId eid, string data)
     {
+        if (eid == EventId.SYNC_SERVER_START)
+        {
 
+        }
+        else if (eid == EventId.SYNC_SERVER_FINISH)
+        {
+
+        }
     }
     public static void OnRecvAdvancedMsg(EventId eid, string data)
     {
-
+        Debug.Log(eid);
+        Debug.Log(data);
     }
     public static void OnRecvGroup(EventId eid, string data)
     {
-
+        Debug.Log(eid);
+        Debug.Log(data);
     }
 
     public static PlatFormID GetPlatFormID()
@@ -76,7 +90,7 @@ public static class Game
         }
         else if (id == EventId.CONNECT_SUCCESS)
         {
-            Game.ChangeProcecure<ProcedureMain>();
+            ChangeProcecure<ProcedureMain>();
         }
         else if (id == EventId.CONNECT_FAILED)
         {
@@ -86,7 +100,7 @@ public static class Game
         }
         else if (id == EventId.USER_TOKEN_EXPIRED)
         {
-            Game.UI.ShowTip("User Token Expired", 2);
+            UI.ShowTip("User Token Expired", 2);
         }
     }
     public static void ChangeProcecure<T>() where T : ProcedureBase
@@ -95,7 +109,7 @@ public static class Game
         var suc = procedures.TryGetValue(typeof(T), out procedure);
         if (!suc)
         {
-            procedure = System.Activator.CreateInstance<T>();
+            procedure = Activator.CreateInstance<T>();
         }
         Game.Entry.ChangeProcedure(procedure);
     }

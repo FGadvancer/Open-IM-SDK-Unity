@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6618438674a5e324eaa210e1987aa905, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
-  LocalDataSaveName: LocalData
   FrameRate: 60
   MusicVolume: 0.7
   SFXVolume: 0.9

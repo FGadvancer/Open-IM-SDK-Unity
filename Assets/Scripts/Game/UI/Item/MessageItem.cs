@@ -15,11 +15,12 @@ public class MessageItem
         this.ui = ui;
         this.parent = parent;
         icon = ui.GetComponent<Image>(parent, "icon");
-        message = ui.GetComponent<TextMeshProUGUI>(parent, "message");
+        message = ui.GetComponent<TextMeshProUGUI>(parent, "message/txt");
     }
 
     public void SetItemInfo(bool isSelf, MsgStruct msg)
     {
         message.text = msg.TextElem.Content;
+          
     }
 }

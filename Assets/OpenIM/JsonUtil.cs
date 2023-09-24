@@ -3,11 +3,7 @@ namespace OpenIM
 {
     public static class JsonUtil
     {
-        private class Pack<T>
-        {
-            public T data;
-        }
-        public static string ToJson<T>(T obj)
+        public static string ToJson(object obj)
         {
             return JsonConvert.SerializeObject(obj);
         }

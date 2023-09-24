@@ -4,27 +4,35 @@ public class Player
 {
     public string UserID;
     public List<LocalConversation> ConversationData;
-    Dictionary<string, AdvancedHistoryMessageData> mHistoryMsgDic;
+    Dictionary<string, List<MsgStruct>> mHistoryMsgDic;
 
     public Player(string userID)
     {
         UserID = userID;
-        mHistoryMsgDic = new Dictionary<string, AdvancedHistoryMessageData>();
+        mHistoryMsgDic = new Dictionary<string, List<MsgStruct>>();
     }
 
-    public void AddHistoryMessage(string userID, AdvancedHistoryMessageData data)
+    public void AddMsgRecord(string userID, MsgStruct msg)
     {
-        if (mHistoryMsgDic.ContainsKey(userID))
-        {
-            mHistoryMsgDic.Remove(userID);
-        }
-        mHistoryMsgDic.Add(userID, data);
-    }
-
-    public AdvancedHistoryMessageData GetHistoryMessage(string userID)
-    {
-        AdvancedHistoryMessageData data = null;
+        List<MsgStruct> data;
         mHistoryMsgDic.TryGetValue(userID, out data);
+        if (data == null)
+        {
+            data = new List<MsgStruct>();
+            mHistoryMsgDic.Add(userID, data);
+        }
+        data.Add(msg);
+    }
+
+    public List<MsgStruct> GetMsgRecord(string userID)
+    {
+        List<MsgStruct> data;
+        mHistoryMsgDic.TryGetValue(userID, out data);
+        if (data == null)
+        {
+            data = new List<MsgStruct>();
+            mHistoryMsgDic.Add(userID, data);
+        }
         return data;
     }
     public bool HasHistory(string userID)

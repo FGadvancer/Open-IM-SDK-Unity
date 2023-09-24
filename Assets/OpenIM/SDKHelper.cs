@@ -60,6 +60,10 @@ namespace OpenIM
         //加入到主线程执行队列（有延迟）
         public static void QueueOnMainThread(Action action, float time)
         {
+            if (Instance == null)
+            {
+                return;
+            }
             if (time != 0)
             {
                 lock (Instance.listDelayedActions)

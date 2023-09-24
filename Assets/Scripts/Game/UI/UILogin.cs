@@ -29,6 +29,7 @@ public class UILogin : UILogicBase
     }
     public void OnLoginStatusChange(ErrorCode errCode, string errMsg, string data)
     {
+        Debug.Log(errCode + errMsg + data);
         if (errCode == ErrorCode.LoginRepeatError)
         {
             Game.Player.UserID = uid.text;

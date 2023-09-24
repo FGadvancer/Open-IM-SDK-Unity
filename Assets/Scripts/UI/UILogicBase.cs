@@ -61,7 +61,7 @@ public abstract class UILogicBase
         });
     }
 
-    public void RefreshList(LoopListView2 list, int count)
+    public void RefreshList(LoopListView2 list, int count, int showIndex = 0, float offset = 0)
     {
         if (list.ItemTotalCount != count)
         {
@@ -71,5 +71,6 @@ public abstract class UILogicBase
         {
             list.RefreshAllShownItem();
         }
+        list.MovePanelToItemIndex(showIndex, 0);
     }
 }

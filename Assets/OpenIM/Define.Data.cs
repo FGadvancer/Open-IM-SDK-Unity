@@ -316,7 +316,7 @@ namespace OpenIM
         public int GroupMemberCount;
     }
 
-    
+
 
     public class CmdJoinedSuperGroup
     {

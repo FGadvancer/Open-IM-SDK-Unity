@@ -30,7 +30,7 @@ namespace OpenIM
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int get_login_status(string operationID);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string get_login_user();
+        public static extern IntPtr get_login_user();
         #endregion
 
         #region Global Listen
@@ -54,49 +54,49 @@ namespace OpenIM
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr create_text_message(string operationID, string text);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_advanced_text_message(string operationID, string text, string messageEntityList);
+        public static extern IntPtr create_advanced_text_message(string operationID, string text, string messageEntityList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_text_at_message(string operationID, string text, string atUserList, string atUsersInfo, string message);
+        public static extern IntPtr create_text_at_message(string operationID, string text, string atUserList, string atUsersInfo, string message);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_location_message(string operationID, string description, double longitude, double latitude);
+        public static extern IntPtr create_location_message(string operationID, string description, double longitude, double latitude);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_custom_message(string operationID, string data, string extension, string description);
+        public static extern IntPtr create_custom_message(string operationID, string data, string extension, string description);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_quote_message(string operationID, string text, string message);
+        public static extern IntPtr create_quote_message(string operationID, string text, string message);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_advanced_quote_message(string operationID, string text, string message, string messageEntityList);
+        public static extern IntPtr create_advanced_quote_message(string operationID, string text, string message, string messageEntityList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_card_message(string operationID, string cardInfo);
+        public static extern IntPtr create_card_message(string operationID, string cardInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_video_message_from_full_path(string operationID, string videoFullPath, string videoType, long duration, string snapshotFullPath);
+        public static extern IntPtr create_video_message_from_full_path(string operationID, string videoFullPath, string videoType, long duration, string snapshotFullPath);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_image_message_from_full_path(string operationID, string imageFullPath);
+        public static extern IntPtr create_image_message_from_full_path(string operationID, string imageFullPath);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_sound_message_from_full_path(string operationID, string soundPath, Int64 duration);
+        public static extern IntPtr create_sound_message_from_full_path(string operationID, string soundPath, Int64 duration);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_file_message_from_full_path(string operationID, string fileFullPath, string fileName);
+        public static extern IntPtr create_file_message_from_full_path(string operationID, string fileFullPath, string fileName);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_image_message(string operationID, string imagePath);
+        public static extern IntPtr create_image_message(string operationID, string imagePath);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_image_message_by_url(string operationID, string sourcePicture, string bigPicture, string snapshotPicture);
+        public static extern IntPtr create_image_message_by_url(string operationID, string sourcePicture, string bigPicture, string snapshotPicture);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_sound_message_by_url(string operationID, string soundBaseInfo);
+        public static extern IntPtr create_sound_message_by_url(string operationID, string soundBaseInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_sound_message(string operationID, string soundPath, Int64 duration);
+        public static extern IntPtr create_sound_message(string operationID, string soundPath, Int64 duration);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_video_message_by_url(string operationID, string videoBaseInfo);
+        public static extern IntPtr create_video_message_by_url(string operationID, string videoBaseInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_video_message(string operationID, string videoPath, string videoType, Int64 duration, string snapshotPath);
+        public static extern IntPtr create_video_message(string operationID, string videoPath, string videoType, Int64 duration, string snapshotPath);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_file_message_by_url(string operationID, string fileBaseInfo);
+        public static extern IntPtr create_file_message_by_url(string operationID, string fileBaseInfo);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_file_message(string operationID, string filePath, string fileName);
+        public static extern IntPtr create_file_message(string operationID, string filePath, string fileName);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_merger_message(string operationID, string messageList, string title, string summaryList);
+        public static extern IntPtr create_merger_message(string operationID, string messageList, string title, string summaryList);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_face_message(string operationID, int index, string data);
+        public static extern IntPtr create_face_message(string operationID, int index, string data);
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern string create_forward_message(string operationID, string m);
+        public static extern IntPtr create_forward_message(string operationID, string m);
 
         [DllImport(OPENIMDLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void send_message(CB_S_I_S_S_I cb, string operationID, string message, string recvID, string groupID, string offlinePushInfo);
