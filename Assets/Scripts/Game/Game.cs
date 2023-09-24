@@ -52,6 +52,7 @@ public static class Game
     }
     public static void OnRecvConversation(EventId eid, string data)
     {
+        Debug.Log(eid + " " + data);
         if (eid == EventId.SYNC_SERVER_START)
         {
 
@@ -60,11 +61,20 @@ public static class Game
         {
 
         }
+        
     }
     public static void OnRecvAdvancedMsg(EventId eid, string data)
     {
-        Debug.Log(eid);
-        Debug.Log(data);
+        Debug.Log(eid + "  " + data);
+        if (eid == EventId.RECV_NEW_MESSAGE)
+        {
+            var msg = JsonUtil.FromJson<MsgStruct>(data);
+            if (msg.ContentType == (int)ContentType.Text)
+            {
+                Game.Player.AddMsgRecord(msg.SendID, msg);
+                Game.Event.Broadcast<MsgStruct>(EventType.RecvMsg, msg);
+            }
+        }
     }
     public static void OnRecvGroup(EventId eid, string data)
     {

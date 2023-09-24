@@ -79,6 +79,7 @@ public class UIChat : UILogicBase
             msgDatas = Game.Player.GetMsgRecord(conversation.UserID);
             RefreshList(chatList, msgDatas.Count, msgDatas.Count - 1, 0);
         }
+        Game.Event.AddListener<MsgStruct>(EventType.RecvMsg, OnRecvNewMessage);
     }
 
     public void OnSendMessage(string operationId, ErrorCode errorCode, string errMsg, string data, int progress)
@@ -117,12 +118,17 @@ public class UIChat : UILogicBase
             Game.UI.ShowTip(errMsg, 2f, false, false);
         }
     }
+    public void OnRecvNewMessage(MsgStruct msg)
+    {
+        RefreshList(chatList, msgDatas.Count, msgDatas.Count - 1, 0);
+    }
     public override void OnUpdate(float dt)
     {
 
     }
     public override void OnClose()
     {
+        Game.Event.RemoveListener<MsgStruct>(EventType.RecvMsg, OnRecvNewMessage);
         chatList.Reset();
     }
 }
