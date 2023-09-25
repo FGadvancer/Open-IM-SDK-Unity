@@ -29,10 +29,17 @@ public partial class UIMain
             item.SetItemInfo(Game.Player.ConversationData[index]);
             return obj;
         });
+
+        Game.Event.AddListener(EventType.OnConversationChange, OnConversationChange);
     }
     public void CloseChat()
     {
+        Game.Event.RemoveListener(EventType.OnConversationChange, OnConversationChange);
         conversationlist.Reset();
+    }
+    public void OnConversationChange()
+    {
+        OpenIMSDK.GetConversationList(OnRecvConversationList);
     }
     public void OnRecvConversationList(ErrorCode err, string errMsg, List<LocalConversation> list)
     {
@@ -40,7 +47,7 @@ public partial class UIMain
         {
             if (list != null)
             {
-                Game.Player.ConversationData = list ;
+                Game.Player.ConversationData = list;
                 RefreshList(conversationlist, list.Count);
             }
         }

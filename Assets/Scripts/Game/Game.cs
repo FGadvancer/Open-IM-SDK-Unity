@@ -31,12 +31,15 @@ public static class Game
         Player = new Player(Config.TestID);
         bool suc = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
         Debug.Log("InitSDK res " + suc);
+#if UNITY_EDITOR
         if (!suc)
         {
             Debug.LogError("Init SDK Error");
             EditorApplication.isPlaying = false;
             return;
         }
+#else
+#endif
         OpenIMSDK.SetGroupListener(OnRecvGroup);
         OpenIMSDK.SetConversationListener(OnRecvConversation);
         OpenIMSDK.SetAdvancedMsgListener(OnRecvAdvancedMsg);
@@ -61,7 +64,10 @@ public static class Game
         {
 
         }
-        
+        if (eid == EventId.CONVERSATION_CHANGED)
+        {
+            Game.Event.Broadcast(EventType.OnConversationChange);
+        }
     }
     public static void OnRecvAdvancedMsg(EventId eid, string data)
     {

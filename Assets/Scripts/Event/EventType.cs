@@ -7,4 +7,5 @@ public enum EventType
     LoginFailed,
     RecvConversation,
     RecvMsg,
+    OnConversationChange,
 }

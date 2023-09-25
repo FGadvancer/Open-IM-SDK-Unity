@@ -35,14 +35,12 @@ public class UIChat : UILogicBase
         });
         OnClick(sendBtn, () =>
         {
-            if (inputMsg.text == "")
-            {
-                Game.UI.ShowTip("Message Cant Empty", 2.0f);
-                return;
-            }
-            var message = OpenIMSDK.CreateTextMessage(inputMsg.text);
-            OpenIMSDK.SendMessage(message, conversation.UserID, conversation.GroupID, "{}", OnSendMessage);
-            inputMsg.text = "";
+            SendMsg();
+        });
+        inputMsg.onSubmit.RemoveAllListeners();
+        inputMsg.onSubmit.AddListener((value) =>
+        {
+            SendMsg();
         });
 
         chatList.InitListView(0, (view, index) =>
@@ -81,7 +79,18 @@ public class UIChat : UILogicBase
         }
         Game.Event.AddListener<MsgStruct>(EventType.RecvMsg, OnRecvNewMessage);
     }
-
+    public void SendMsg()
+    {
+        if (inputMsg.text == "")
+        {
+            Game.UI.ShowTip("Message Cant Empty", 2.0f);
+            return;
+        }
+        var message = OpenIMSDK.CreateTextMessage(inputMsg.text);
+        OpenIMSDK.SendMessage(message, conversation.UserID, conversation.GroupID, "{}", OnSendMessage);
+        inputMsg.text = "";
+        inputMsg.ActivateInputField();
+    }
     public void OnSendMessage(string operationId, ErrorCode errorCode, string errMsg, string data, int progress)
     {
         if (errorCode != ErrorCode.None)

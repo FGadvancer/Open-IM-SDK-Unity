@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
-
+using AOT;
 namespace OpenIM
 {
     public delegate void OnConnectStatus(EventId eventId, string data);
@@ -94,13 +94,16 @@ namespace OpenIM
             }
             callBackBindDic.Add(key, cb);
         }
+
+        [MonoPInvokeCallback(typeof(print))]
+        public static void Print(string info)
+        {
+            Debug.Log(info);
+        }
+        [MonoPInvokeCallback(typeof(CB_I_S))]
         public static void OnConnectStatusChange(int eventId, string data)
         {
             CallBindFunc(FuncBindKey.Conn, eventId, data);
-        }
-        static void Print(string info)
-        {
-            Debug.Log(info);
         }
         public static bool InitSDK(IMConfig config, OnConnectStatus cb)
         {
@@ -119,6 +122,7 @@ namespace OpenIM
         {
             return (LoginStatus)OpenIMDLL.get_login_status(GetOperationID());
         }
+        [MonoPInvokeCallback(typeof(CB_S_I_S_S))]
         public static void OnLoginStatusChange(string operationId, int errCode, string msg, string data)
         {
             CallBindFunc(FuncBindKey.Login, (ErrorCode)errCode, msg, data);
@@ -132,11 +136,14 @@ namespace OpenIM
         {
             CallBindFunc(FuncBindKey.Logout, (ErrorCode)errCode, msg, data);
         }
+
+        [MonoPInvokeCallback(typeof(CB_S_I_S_S))]
         public static void Logout(OnLogOutStatus cb)
         {
             Register(FuncBindKey.Logout, cb);
             OpenIMDLL.logout(OnLoginOut, GetOperationID());
         }
+        [MonoPInvokeCallback(typeof(CB_S_I_S_S))]
         public static void OnRecvConversationList(string operationID, int errCode, string errMsg, string data)
         {
             var list = JsonUtil.FromJson<List<LocalConversation>>(data);
@@ -148,6 +155,7 @@ namespace OpenIM
             var operationId = GetOperationID();
             OpenIMDLL.get_all_conversation_list(OnRecvConversationList, operationId);
         }
+        [MonoPInvokeCallback(typeof(CB_S_I_S_S))]
         public static void RecvAdvancedHistoryMessage(string operationId, int errCode, string errMsg, string data)
         {
             var msgData = errCode == (int)ErrorCode.None ? JsonUtil.FromJson<AdvancedHistoryMessageData>(data) : null;
@@ -158,6 +166,7 @@ namespace OpenIM
             Register(FuncBindKey.RecvHistoryMessage, cb);
             OpenIMDLL.get_advanced_history_message_list(RecvAdvancedHistoryMessage, GetOperationID(), JsonUtil.ToJson(args));
         }
+        [MonoPInvokeCallback(typeof(CB_I_S))]
         public static void OnGroupListener(int eid, string data)
         {
             CallBindFunc(FuncBindKey.GroupListener, (EventId)eid, data);
@@ -167,6 +176,8 @@ namespace OpenIM
             Register(FuncBindKey.GroupListener, cb);
             OpenIMDLL.set_group_listener(OnGroupListener);
         }
+
+        [MonoPInvokeCallback(typeof(CB_I_S))]
         static void OnConversationListener(int eid, string data)
         {
             CallBindFunc(FuncBindKey.ConversitionListener, (EventId)eid, data);
@@ -176,6 +187,8 @@ namespace OpenIM
             Register(FuncBindKey.ConversitionListener, cb);
             OpenIMDLL.set_conversation_listener(OnConversationListener);
         }
+
+        [MonoPInvokeCallback(typeof(CB_I_S))]
         static void OnAdvancedMsgListener(int eid, string data)
         {
             CallBindFunc(FuncBindKey.AdvancedMsgListener, (EventId)eid, data);
@@ -194,7 +207,7 @@ namespace OpenIM
             // Marshal.FreeHGlobal(strPtr);
             return res;
         }
-
+        [MonoPInvokeCallback(typeof(CB_S_I_S_S_I))]
         static void OnSendMessage(string operationId, int errorCode, string errMsg, string data, int progress)
         {
             CallBindFunc(FuncBindKey.SendMessage, operationId, (ErrorCode)errorCode, errMsg, data, progress);
