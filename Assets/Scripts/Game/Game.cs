@@ -17,6 +17,7 @@ public static class Game
     static Dictionary<Type, ProcedureBase> procedures = new Dictionary<Type, ProcedureBase>();
     public static void Init()
     {
+        HttpUrl.Init(Config.UserTokenURLPrefix);
         var config = new IMConfig
         {
             PlatformID = (int)GetPlatFormID(),
@@ -28,10 +29,17 @@ public static class Game
             LogFilePath = Application.persistentDataPath,
             IsExternalExtensions = true
         };
-        Player = new Player(Config.TestID);
+        var savePlayer = PlayerPrefs.GetString("PlayerData");
+        var player = JsonUtil.FromJson<Player>(savePlayer);
+        if (player == null)
+        {
+            player = new Player(Config.TestID);
+        }
+        Game.Player = player;
         bool suc = OpenIMSDK.InitSDK(config, OnConnectStatusChange);
         Debug.Log("InitSDK res " + suc);
 #if UNITY_EDITOR
+        // player.Token = Config.TestToken;
         if (!suc)
         {
             Debug.LogError("Init SDK Error");
@@ -106,10 +114,12 @@ public static class Game
         }
         else if (id == EventId.CONNECT_SUCCESS)
         {
+            PlayerPrefs.SetString("PlayerData", JsonUtil.ToJson(Game.Player));
             ChangeProcecure<ProcedureMain>();
         }
         else if (id == EventId.CONNECT_FAILED)
         {
+            UI.ShowError(data, 2);
         }
         else if (id == EventId.KICKED_OFFLINE)
         {

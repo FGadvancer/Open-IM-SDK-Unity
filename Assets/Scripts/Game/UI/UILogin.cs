@@ -5,26 +5,32 @@ using OpenIM;
 public class UILogin : UILogicBase
 {
     TMP_InputField uid;
-    TMP_InputField token;
     Button loginBtn;
-    TextMeshProUGUI status;
+    Button registerBtn;
     public override void Init()
     {
         loginBtn = GetComponent<Button>("login");
+        registerBtn = GetComponent<Button>("register");
         uid = GetComponent<TMP_InputField>("uid");
-        token = GetComponent<TMP_InputField>("token");
     }
     public override void OnDestroy()
     {
     }
     public override void OnOpen(object userData)
     {
-        uid.text = Game.Config.TestID;
-        token.text = Game.Config.TestToken;
-
+        uid.text = Game.Player.UserID;
         OnClick(loginBtn, () =>
         {
-            OpenIMSDK.Login(uid.text, token.text, OnLoginStatusChange);
+            Game.Http.Post(HttpUrl.AccountCheck, new AccountCheckArgs(uid.text).ToJson(), (suc, data) =>
+            {
+                Debug.Log(suc);
+                Debug.Log(data);
+            });
+            // OpenIMSDK.Login(uid.text, Game.Player.Token, OnLoginStatusChange);
+        });
+        OnClick(registerBtn, () =>
+        {
+
         });
     }
     public void OnLoginStatusChange(ErrorCode errCode, string errMsg, string data)
@@ -32,8 +38,7 @@ public class UILogin : UILogicBase
         Debug.Log(errCode + errMsg + data);
         if (errCode == ErrorCode.LoginRepeatError)
         {
-            Game.Player.UserID = uid.text;
-            Game.ChangeProcecure<ProcedureMain>();
+            Game.UI.ShowError(errMsg, 2);
         }
         else if (errCode == ErrorCode.None)
         {

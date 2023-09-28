@@ -3,9 +3,21 @@ using OpenIM;
 public class Player
 {
     public string UserID;
-    public List<LocalConversation> ConversationData;
+    public string Token;
+    List<LocalConversation> mConversationData;
     Dictionary<string, List<MsgStruct>> mHistoryMsgDic;
 
+    public List<LocalConversation> ConversationData
+    {
+        get
+        {
+            return mConversationData;
+        }
+        set
+        {
+            mConversationData = value;
+        }
+    }
     public Player(string userID)
     {
         UserID = userID;

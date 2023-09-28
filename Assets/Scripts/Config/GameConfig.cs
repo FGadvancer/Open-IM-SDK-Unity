@@ -9,4 +9,5 @@ public class GameConfig : ScriptableObject
     public float SFXVolume = .9f;
     public string TestID;
     public string TestToken;
+    public string UserTokenURLPrefix = "http://125.124.195.201:10002";
 }

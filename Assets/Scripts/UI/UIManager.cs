@@ -86,7 +86,10 @@ public class UIManager : MonoBehaviour
             Debug.LogError(name + "Not Find UIName ");
         }
     }
-
+    public void ShowError(string tip, float duration)
+    {
+        ShowError(tip, duration, false, false);
+    }
     public void ShowError(string str, float duration, bool showMask, bool canClose)
     {
         UIItem ui;
