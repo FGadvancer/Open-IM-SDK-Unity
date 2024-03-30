@@ -1,40 +1,51 @@
+using System.Data;
 using open_im_sdk;
 using UnityEngine;
-
-public class ChatApp : MonoBehaviour
+public class ChatApp : SingletonMB<ChatApp>
 {
     public UILogin UILogin;
     public UIMain UIMain;
-
-    static string WsAddr = "ws://14.29.168.56:20001";
-    static string ApiAddr = "http://14.29.168.56:20002";
+    public string WsAddr = "ws://14.29.168.56:20001";
+    public string ApiAddr = "http://14.29.168.56:20002";
     // public static string WsAddr = "ws://14.29.213.197:50001";
     // public static string ApiAddr = "http://14.29.213.197:50002";
-    void Awake()
+    [HideInInspector]
+    public LocalCacheData LocalCacheData;
+    protected override void Awake()
     {
-        InitListen();
-        var suc = Player.CurPlayer.Init(WsAddr, ApiAddr);
-        if (!suc)
+        base.Awake();
+
+        var data = PlayerPrefs.GetString("ChatAppCachaData");
+        if (data == "")
         {
-            Debug.Log("Init Error");
+            LocalCacheData = new LocalCacheData();
+        }
+        else
+        {
+            LocalCacheData = JsonUtility.FromJson<LocalCacheData>(data);
+        }
+
+        var suc = Player.CurPlayer.Init(WsAddr, ApiAddr);
+        if (suc)
+        {
+            UILogin.transform.gameObject.SetActive(true);
+            UIMain.transform.gameObject.SetActive(false);
+        }
+        else
+        {
+            UILogin.transform.gameObject.SetActive(false);
+            UIMain.transform.gameObject.SetActive(false);
         }
     }
-    void OnDestroy()
+
+    protected override void OnDestroy()
     {
-        Player.CurPlayer.UnLogin();
-        Player.CurPlayer.Destroy();
-    }
-    void Start()
-    {
-        UILogin.gameObject.SetActive(true);
-        UIMain.gameObject.SetActive(false);
-    }
-    void Update()
-    {
-        Player.CurPlayer.Update();
+        base.OnDestroy();
+
     }
 
-    void InitListen()
+
+    void Start()
     {
         var dispator = Player.CurPlayer.Dispator;
         dispator.AddListener(EventType.OnLoginSuc, () =>
@@ -42,17 +53,32 @@ public class ChatApp : MonoBehaviour
             UILogin.gameObject.SetActive(false);
             UIMain.gameObject.SetActive(true);
         });
-        dispator.AddListener(EventType.OnTokenExpired, () =>
+        Player.CurPlayer.Dispator.AddListener(EventType.OnTokenExpired, () =>
         {
-            UILogin.gameObject.SetActive(true);
-            UIMain.transform.gameObject.SetActive(false);
             Debug.Log("Token Expired");
-        });
-        dispator.AddListener(EventType.OnConversationSyncFailed, () =>
-        {
-            UILogin.gameObject.SetActive(true);
+            UILogin.transform.gameObject.SetActive(true);
             UIMain.transform.gameObject.SetActive(false);
-            Player.CurPlayer.UnLogin();
         });
+    }
+    void Update()
+    {
+        Player.CurPlayer.Update();
+    }
+
+
+
+    void OnApplicationQuit()
+    {
+        Debug.Log("ApplicationQuit");
+        SaveLocalData();
+        Player.CurPlayer.UnLogin();
+        Player.CurPlayer.Destroy();
+        PlayerPrefs.Save();
+    }
+    public void SaveLocalData()
+    {
+        var data = JsonUtility.ToJson(LocalCacheData);
+        Debug.Log("Save ChatAppCachaData = " + data);
+        PlayerPrefs.SetString("ChatAppCachaData", data);
     }
 }

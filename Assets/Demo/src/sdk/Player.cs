@@ -8,6 +8,7 @@ public enum UserStatus
 public class Player : IConnCallBack
 {
     public string UserId;
+    public string Token;
     private static Player curPlayer;
     public static Player CurPlayer
     {
@@ -77,22 +78,36 @@ public class Player : IConnCallBack
 
     public bool Init(string wsAddr, string apiAddr)
     {
+#if UNITY_EDITOR
+        string dataDir = "./OpenIM";
+        string logDir = "./OpenIM/Logs";
+#else
+        string dataDir = Application.persistentDataPath + "/OpenIM";
+        string logDir = Application.persistentDataPath + "/OpenIM/Logs";
+#endif
+        Debug.Log("PlatformId:" + PlatformID + "  " + (int)PlatformID);
+        Debug.Log("WsAddr:" + wsAddr);
+        Debug.Log("APIAddr:" + apiAddr);
+        Debug.Log("DataDir:" + dataDir);
+        Debug.Log("LogDir:" + logDir);
         var config = new IMConfig()
         {
             PlatformID = (int)PlatformID,
             WsAddr = wsAddr,
             ApiAddr = apiAddr,
-            DataDir = "./OpenIM",
+            DataDir = dataDir,
             LogLevel = 5,
             IsLogStandardOutput = true,
-            LogFilePath = "./OpenIM/Logs",
+            LogFilePath = logDir,
             IsExternalExtensions = true,
         };
         var res = IMSDK.InitSDK(config, this);
         if (!res)
         {
+            Debug.Log("InitSDK:" + false);
             return false;
         }
+        Debug.Log("InitSDK:" + res);
         conversation = new Conversation();
         friendship = new FriendShip();
         group = new Group();
@@ -104,6 +119,7 @@ public class Player : IConnCallBack
     }
     public void Destroy()
     {
+        Debug.Log("Player:Destroy");
         IMSDK.UnInitSDK();
     }
     public void Update()
@@ -137,33 +153,60 @@ public class Player : IConnCallBack
 
     public void Login(string userId, string token)
     {
+        Debug.Log("UserId:" + userId);
+        Debug.Log("Token:" + token);
         IMSDK.Login(userId, token, (suc, errCode, errMsg) =>
         {
             if (suc)
             {
-                OnLoginSuc(userId);
+                OnLoginSuc(userId, token);
             }
         });
     }
 
-    public void OnLoginSuc(string userId)
+    public void OnLoginSuc(string userId, string token)
     {
+        Debug.Log("Login Suc");
         UserId = userId;
+        Token = token;
         InitData();
         Dispator.Broadcast(EventType.OnLoginSuc);
+
+        SaveUserToken();
+
+    }
+
+    public void SaveUserToken()
+    {
+        var localCacheData = ChatApp.GetInstance().LocalCacheData;
+        for (int i = 0; i < localCacheData.LocalUserTokens.Count; i++)
+        {
+            if (localCacheData.LocalUserTokens[i].UserId == UserId)
+            {
+                localCacheData.LocalUserTokens.RemoveAt(i);
+                break;
+            }
+        }
+        localCacheData.LocalUserTokens.Add(new LocalUserIdToken()
+        {
+            UserId = UserId,
+            Token = Token,
+        });
+        ChatApp.GetInstance().SaveLocalData();
     }
 
     public void UnLogin()
     {
+        Debug.Log("Call UnLogin");
         IMSDK.Logout((suc, errCode, errMsg) =>
         {
             if (suc)
             {
-
+                Debug.Log("Call UnLogin:" + true);
             }
             else
             {
-                Debug.Log(errCode + errMsg);
+                Debug.Log("Call UnLogin:" + errCode + errMsg);
             }
         });
     }
@@ -174,7 +217,7 @@ public class Player : IConnCallBack
         {
             if (list != null)
             {
-                Debug.Log("FriendCount = " + list.Count);
+                Debug.Log("Friend Count : " + list.Count);
                 foreach (var info in list)
                 {
                     Friend.AddLocalFriend(info.FriendInfo);
@@ -190,7 +233,7 @@ public class Player : IConnCallBack
         {
             if (list != null)
             {
-                Debug.Log("Friend Request Count = " + list.Count);
+                Debug.Log("Friend Request Count : " + list.Count);
                 Friend.RequestList.AddRange(list);
                 Dispator.Broadcast(EventType.OnFirendRequestChange);
             }
@@ -203,7 +246,7 @@ public class Player : IConnCallBack
         {
             if (list != null)
             {
-                Debug.Log("Friend Application Count = " + list.Count);
+                Debug.Log("Friend Application Count : " + list.Count);
                 Friend.ApplicationList.AddRange(list);
                 Dispator.Broadcast(EventType.OnFirendApplicationChange);
             }

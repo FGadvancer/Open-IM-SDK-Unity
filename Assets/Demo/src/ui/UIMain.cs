@@ -33,13 +33,13 @@ public partial class UIMain : MonoBehaviour
     }
     void RegisterUI()
     {
-        userId = transform.Find("content/userId").GetComponent<TextMeshProUGUI>();
+        userId = transform.Find("content/left/userId").GetComponent<TextMeshProUGUI>();
         toggles = new Toggle[5];
-        toggles[0] = transform.Find("content/menu/world").GetComponent<Toggle>();
-        toggles[1] = transform.Find("content/menu/channel").GetComponent<Toggle>();
-        toggles[2] = transform.Find("content/menu/group").GetComponent<Toggle>();
-        toggles[3] = transform.Find("content/menu/friend").GetComponent<Toggle>();
-        toggles[4] = transform.Find("content/menu/search").GetComponent<Toggle>();
+        toggles[0] = transform.Find("content/left/menu/world").GetComponent<Toggle>();
+        toggles[1] = transform.Find("content/left/menu/channel").GetComponent<Toggle>();
+        toggles[2] = transform.Find("content/left/menu/group").GetComponent<Toggle>();
+        toggles[3] = transform.Find("content/left/menu/friend").GetComponent<Toggle>();
+        toggles[4] = transform.Find("content/left/menu/search").GetComponent<Toggle>();
         toggles[0].onValueChanged.AddListener((ison) =>
         {
             worldTrans.gameObject.SetActive(ison);
@@ -55,6 +55,10 @@ public partial class UIMain : MonoBehaviour
         toggles[3].onValueChanged.AddListener((ison) =>
         {
             friendTrans.gameObject.SetActive(ison);
+            if (ison)
+            {
+                RefreshFriendList();
+            }
         });
         toggles[4].onValueChanged.AddListener((ison) =>
         {
@@ -72,6 +76,9 @@ public partial class UIMain : MonoBehaviour
         friendTrans.gameObject.SetActive(false);
         searchTrans.gameObject.SetActive(false);
 
+
+        userId.text = Player.CurPlayer.UserId;
+
         InitWorldUI();
         InitChannelUI();
         InitGroupUI();
@@ -81,11 +88,6 @@ public partial class UIMain : MonoBehaviour
     public void InitListen()
     {
         var dispator = Player.CurPlayer.Dispator;
-        dispator.AddListener(EventType.OnLoginSuc, () =>
-        {
-            userId.text = Player.CurPlayer.UserId;
-            RefreshFriendList();
-        });
         dispator.AddListener<LocalConversation>(EventType.OnConversationChange, (converation) =>
         {
             OnConverationChange(converation);
@@ -101,6 +103,11 @@ public partial class UIMain : MonoBehaviour
         dispator.AddListener(EventType.OnFirendApplicationChange, () =>
         {
             RefreshFriendApplicationList();
+
+        });
+        dispator.AddListener(EventType.OnTokenExpired, () =>
+        {
+            gameObject.SetActive(false);
         });
     }
 

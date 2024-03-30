@@ -131,6 +131,7 @@ public partial class UIMain
             return;
         }
         var msgStruct = IMSDK.CreateTextMessage(msg);
+        Debug.Log(msgStruct);
         IMSDK.SendMessage((msg, errCode, errMsg) =>
         {
             if (msg != null)

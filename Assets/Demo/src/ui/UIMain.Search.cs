@@ -129,6 +129,7 @@ public partial class UIMain
             item.Name.text = info.ToUserID;
             return itemNode;
         });
+
         friendRequestList.SetListItemCount(Player.CurPlayer.Friend.RequestList.Count);
 
         friendApplictionList.InitListView(0, (list, index) =>

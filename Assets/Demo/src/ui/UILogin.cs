@@ -3,51 +3,109 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System.Dynamic;
-using open_im_sdk;
+using SuperScrollView;
+using UnityEngine.SocialPlatforms;
+
+public class UserHistoryItem
+{
+    public Button btn;
+    public TextMeshProUGUI text;
+}
+
 public class UILogin : MonoBehaviour
 {
-    public TMP_Dropdown UserIdDropDown;
-    public TMP_InputField TokenTxt;
-    public Button loginBtn;
-    List<string> userIds;
-    List<string> tokens;
-    int selectIndex = 0;
-    void Awake()
-    {
-        userIds = new List<string>(){
-            "yejian001","yejian002"
-        };
-        tokens = new List<string>(){
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJ5ZWppYW4wMDEiLCJQbGF0Zm9ybUlEIjozLCJleHAiOjE3MTY2MTQzOTEsIm5iZiI6MTcwODgzODA5MSwiaWF0IjoxNzA4ODM4MzkxfQ.4xB2OzU8uSZCWeNWQwRn6LF4b2XtjmR9lDGIvk_Sq7o",
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOiJ5ZWppYW4wMDIiLCJQbGF0Zm9ybUlEIjozLCJleHAiOjE3MTY2NDY1NTYsIm5iZiI6MTcwODg3MDI1NiwiaWF0IjoxNzA4ODcwNTU2fQ.uzXn6Vzmi_y6o9-3qtlsMCrpx2ubibqE1YhRDIHd31g",
-        };
-    }
+    TMP_InputField userId;
+    TMP_InputField token;
+    Button loginBtn;
 
+    Transform historyPanel;
+    Button historyBtn;
+    LoopListView2 historyList;
+    Button closeHistoryBtn;
     void Start()
     {
-        TokenTxt.text = tokens[0];
-        UserIdDropDown.AddOptions(userIds);
-        UserIdDropDown.onValueChanged.AddListener((index) =>
+        userId = transform.Find("userId/input").GetComponent<TMP_InputField>();
+        token = transform.Find("token/input").GetComponent<TMP_InputField>();
+        loginBtn = transform.Find("login").GetComponent<Button>();
+        historyBtn = transform.Find("historybtn").GetComponent<Button>();
+        historyPanel = transform.Find("historyPanel");
+        historyList = historyPanel.Find("content/list").GetComponent<LoopListView2>();
+        closeHistoryBtn = historyPanel.Find("content/close").GetComponent<Button>();
+
+        historyPanel.gameObject.SetActive(false);
+
+        int historyUserCount = ChatApp.GetInstance().LocalCacheData.LocalUserTokens.Count;
+        if (historyUserCount > 0)
         {
-            selectIndex = index;
-            TokenTxt.text = tokens[index];
-        });
+            var localTokenData = ChatApp.GetInstance().LocalCacheData.LocalUserTokens[historyUserCount - 1];
+            userId.text = localTokenData.UserId;
+            token.text = localTokenData.Token;
+        }
+        else
+        {
+            userId.text = "";
+            token.text = "";
+        }
+
+        loginBtn.onClick.RemoveAllListeners();
         loginBtn.onClick.AddListener(() =>
         {
-            if (IMSDK.GetLoginStatus() == LoginStatus.Logged && IMSDK.GetLoginUser() == userIds[selectIndex])
+            if (userId.text == "" || token.text == "")
             {
-                Player.CurPlayer.OnLoginSuc(userIds[selectIndex]);
+                return;
             }
-            else
-            {
-                Player.CurPlayer.Login(userIds[selectIndex], tokens[selectIndex]);
-            }
+            Player.CurPlayer.Login(userId.text, token.text);
         });
+        historyBtn.onClick.RemoveAllListeners();
+        historyBtn.onClick.AddListener(() =>
+        {
+            historyPanel.gameObject.SetActive(true);
+            RefreshHistoryList();
+        });
+        closeHistoryBtn.onClick.RemoveAllListeners();
+        closeHistoryBtn.onClick.AddListener(() =>
+        {
+            historyPanel.gameObject.SetActive(false);
+        });
+
+        historyList.InitListView(0, (list, index) =>
+        {
+            if (index < 0)
+            {
+                return null;
+            }
+            LoopListViewItem2 itemNode = null;
+            itemNode = list.NewListViewItem("item");
+            if (!itemNode.IsInitHandlerCalled)
+            {
+                itemNode.UserObjectData = new UserHistoryItem()
+                {
+                    btn = itemNode.transform.GetComponent<Button>(),
+                    text = itemNode.transform.Find("userid").GetComponent<TextMeshProUGUI>(),
+                };
+                itemNode.IsInitHandlerCalled = true;
+            }
+            var item = itemNode.UserObjectData as UserHistoryItem;
+            LocalUserIdToken data = ChatApp.GetInstance().LocalCacheData.LocalUserTokens[index];
+            item.text.text = data.UserId;
+            item.btn.onClick.RemoveAllListeners();
+            item.btn.onClick.AddListener(() =>
+            {
+                userId.text = data.UserId;
+                token.text = data.Token;
+                historyPanel.gameObject.SetActive(false);
+            });
+
+            return itemNode;
+        });
+        historyList.SetListItemCount(0);
+
+        
     }
 
-    void Update()
+    void RefreshHistoryList()
     {
-
+        historyList.SetListItemCount(ChatApp.GetInstance().LocalCacheData.LocalUserTokens.Count);
+        historyList.RefreshAllShownItem();
     }
 }
